@@ -134,6 +134,8 @@ def Mdis(pstate, tstate):
     #print(ret)
     return ret
 
+
+
 def search_with_info(problem):
     #store node
     Bstack = PriorityQueue(problem.init_state)
