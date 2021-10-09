@@ -92,7 +92,43 @@ class Board:
                 row += '  '
             print(row)
 
+def valuable_line(points, valid_lines):
+    #count the points in each line
+    lines = [0] * 8
+    #return line
+    ret = 0
+    #return points
+    valid_points = []
+    value = 8
+    value_lines = [0] * 8
+    for point in points:
+        value_lines[point // 8] = 1
+        lines[point // 8] += 1
+    i = -1
+    for line in lines:
+        i += 1
+        if valid_lines[i] * value_lines[i] == 0:
+            continue
+        if line < value:
+            value = line
+            ret = i + 1
+    for point in points:
+        if point // 8 == ret - 1:
+            valid_points.append(point)
+    return ret, valid_points
 
+def dfs(b, point):
+    valid_points = b.get_possible_moves()
+    if len(valid_points) == 0:
+        if len(b.queen) == 8:
+            return True
+        return False
+    else:
+        for point in valid_points:
+            b.make_move(point)
+            if dfs(b, point) == True:
+                return True
+            b.remove_move(point)
 # 回溯法求解八皇后问题
 def solveNQueens(b, j):
     """
@@ -100,7 +136,34 @@ def solveNQueens(b, j):
     j: 起始搜索所在行数
     return: True or False
     """
-    # 请在此处补全代码
+    valid_points = b.get_possible_moves()
+    for point in valid_points:
+        b.make_move(point)
+        if dfs(b, point) == True:
+            return True
+        b.remove_move(point)
+    return False
+
+"""  valid_lines = [1] * 8
+    valid_lines[j - 1] = 0
+    last_move = 0
+    
+    while 1:
+        valid_points = b.get_possible_moves()
+        #find most constraint line
+        #val_line, val_points_in_line = valuable_line(valid_points, valid_lines)
+        
+        if val_line == 0:
+            b.remove_move(last_move)
+        else:
+            for point in val_points_in_line:
+                b.make_move(point)
+
+        #print(valid_points_in_line)
+        #return False 
+        
+    #print(list) """
+
 
 
 if __name__ == '__main__':
