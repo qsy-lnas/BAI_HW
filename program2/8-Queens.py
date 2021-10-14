@@ -129,6 +129,8 @@ def dfs(b, point):
             if dfs(b, point) == True:
                 return True
             b.remove_move(point)
+
+            
 # 回溯法求解八皇后问题
 def solveNQueens(b, j):
     """
