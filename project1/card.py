@@ -10,21 +10,21 @@ class colors(Enum):
     diam = 4
 
 class values(Enum):
-    three = 1
-    four = 2
-    five = 3
-    six = 4
-    seven = 5
-    eight = 6
-    nine = 7
-    ten = 8 
-    J = 9
-    Q = 10
-    K = 11
-    A = 12
-    two = 13
-    sjoker = 14
-    ljoker = 15
+    three = 0
+    four = 1
+    five = 2
+    six = 3
+    seven = 4
+    eight = 5
+    nine = 6
+    ten = 7
+    J = 8
+    Q = 9
+    K = 10
+    A = 11
+    two = 12
+    sjoker = 13
+    ljoker = 14
     
 class card(object):
     def __init__(self, color, value):
@@ -49,7 +49,7 @@ class hand_cards(object):
     def random_card(self):
         pokers = []
         for i in range(1, 5):
-            for j in range(1, 14):
+            for j in range(13):
                 c = card(i, j)
                 pokers.append(c)
         c = card(0, 14)
@@ -58,11 +58,11 @@ class hand_cards(object):
         pokers.append(c)
         random.shuffle(pokers)
         self.mcard = pokers[0:self.cnum]
-        print(self.mcard)
+        #print(self.mcard)
 
     def sort_card(self):
         self.mcard.sort()
-        print(self.mcard)
+        #print(self.mcard)
 
 """ c = card(4, 4)
 b = card(2, 2)
