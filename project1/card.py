@@ -25,6 +25,7 @@ class values(Enum):
     two = 12
     sjoker = 13
     ljoker = 14
+
     
 class card(object):
     def __init__(self, color, value):
