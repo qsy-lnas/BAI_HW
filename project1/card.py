@@ -49,7 +49,7 @@ class hand_cards(object):
     def random_card(self):
         pokers = []
         for i in range(1, 5):
-            for j in range(values.two.value):
+            for j in range(values.sjoker.value):
                 c = card(i, j)
                 pokers.append(c)
         c = card(0, values.sjoker.value)

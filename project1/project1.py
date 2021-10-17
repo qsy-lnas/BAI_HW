@@ -1,4 +1,5 @@
 import numpy as np
+import datetime
 from card import card, hand_cards, values
 
 
@@ -13,18 +14,20 @@ class single_game(object):
         #最佳策略与最短步数
         self.strategy = {}
         self.steps = 15
-        self.steps = self.dfs()
+        print(self.acards)
+        self.dfs()
         print(self.steps)
     
     def card_in_np(self):
         acards = np.zeros(15)
-        k = 0
         for i in range(len(self.cards)):
             acards[self.cards[i].value.value] += 1
         #print(acards)
         return acards
     
     def dfs(self, x = 0):
+        #print(x)
+        #print(self.acards)
         if x > self.steps: return
         #顺子
         k = 0
@@ -34,10 +37,10 @@ class single_game(object):
                 k += 1
                 if k >= 5:
                     # 出牌
-                    for j in range(i, i - k): self.acards[j] -= 1
+                    for j in range(i, i - k, -1): self.acards[j] -= 1
                     self.dfs(x + 1)
                     #回溯
-                    for j in range(i, i - k): self.acards[j] += 1
+                    for j in range(i, i - k, -1): self.acards[j] += 1
         #间隔单顺子
         k = 0
         for q in range(2):
@@ -46,9 +49,9 @@ class single_game(object):
                 else:
                     k += 1
                     if k >= 5:
-                        for j in range(i, i - 2 * k, 2): self.acards[j] -= 1
+                        for j in range(i, i - 2 * k, -2): self.acards[j] -= 1
                         self.dfs(x + 1)
-                        for j in range(i, i - 2 * k, 2): self.acards[j] += 1
+                        for j in range(i, i - 2 * k, -2): self.acards[j] += 1
         #双顺子
         k = 0
         for i in range(values.two.value):
@@ -56,9 +59,9 @@ class single_game(object):
             else:
                 k += 1
                 if k >= 3:
-                    for j in range(i, i - k): self.acards[j] -= 2
+                    for j in range(i, i - k, -1): self.acards[j] -= 2
                     self.dfs(x + 2)
-                    for j in range(i, i - k): self.acards[j] += 2
+                    for j in range(i, i - k, -1): self.acards[j] += 2
         #间隔双顺子
         k = 0
         for q in range(2):
@@ -67,18 +70,18 @@ class single_game(object):
                 else:
                     k += 1
                     if k >= 3:
-                        for j in range(i, i - 2 * k, 2): self.acards[j] -= 2
+                        for j in range(i, i - 2 * k, -2): self.acards[j] -= 2
                         self.dfs(x + 1)
-                        for j in range(i, i - 2 * k, 2): self.acards[j] += 2
+                        for j in range(i, i - 2 * k, -2): self.acards[j] += 2
         #三顺子
         for i in range(values.two.value):
             if self.acards[i] < 3: k = 0;
             else:
                 k += 1
                 if k >= 2:
-                    for j in range(i, i - k): self.acards[j] -= 3
+                    for j in range(i, i - k, -1): self.acards[j] -= 3
                     self.dfs(x + 1)
-                    for j in range(i, i - k): self.acards[j] -= 3
+                    for j in range(i, i - k, -1): self.acards[j] -= 3
         #间隔三顺子
         for q in range(2):
             for i in range(q, values.two.value, 2):
@@ -86,9 +89,9 @@ class single_game(object):
                 else:
                     k += 1
                     if k >= 2:
-                        for j in range(i, i - 2 * k, 2): self.acards[j] -= 3
+                        for j in range(i, i - 2 * k, -2): self.acards[j] -= 3
                         self.dfs(x + 1)
-                        for j in range(i, i - 2 * k, 2): self.acards[j] -= 3
+                        for j in range(i, i - 2 * k, -2): self.acards[j] -= 3
         #带牌
         for i in range(values.sjoker.value):#枚举小王及以下的牌可以作为带牌的主体
             if self.acards[i] <= 3:
@@ -98,7 +101,7 @@ class single_game(object):
                     if self.acards[j] == 0: continue # 无牌(无需考虑相同)
                     self.acards[j] -= 1 # 出牌
                     self.dfs(x + 1)
-                    self.acards[j] += 3 # 回溯
+                    self.acards[j] += 1 # 回溯
                 for j in range(values.sjoker.value): # 带一对
                     if self.acards[j] <= 1: continue
                     self.acards[j] -= 2
@@ -111,7 +114,7 @@ class single_game(object):
                     if (self.acards[j] == 0) or (j == i): continue # 无牌或相同
                     self.acards[j] -= 1 # 出牌
                     self.dfs(x + 1)
-                    self.acards[j] += 3 # 回溯
+                    self.acards[j] += 1 # 回溯
                 for j in range(values.sjoker.value): # 带一对
                     if self.acards[j] <= 1: continue
                     self.acards[j] -= 2 #出对子
@@ -141,26 +144,10 @@ class single_game(object):
                 self.acards[i] += 4
         for i in range(values.ljoker.value + 1):
             if self.acards[i]: x += 1
+        if self.steps > x: print(x)
         self.steps = min(self.steps, x)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                
+              
     
 
-#single_game(30)
+single_game(30)
 
