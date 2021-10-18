@@ -1,5 +1,6 @@
 import numpy as np
 import datetime
+from tqdm import tqdm
 
 from numpy.lib.function_base import append
 from card import card, hand_cards, values
@@ -13,14 +14,14 @@ class single_game(object):
         self.cards = hand_cards(self.cnum).mcard
         #手牌分布数组
         self.acards = self.card_in_np()
-        self.acards = [4, 4, 4, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+        #self.acards = [4, 4, 4, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
         #self.acards = [4, 0, 4, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0]
         #最佳策略与最短步数
         self.strategy = []
         self.steps = 15
-        print(self.acards) 
+        #print(self.acards) 
         self.dfs()
-        print(self.steps)
+        #print(self.steps)
     
     def card_in_np(self):
         acards = np.zeros(15)
@@ -32,7 +33,7 @@ class single_game(object):
     def dfs(self, x = 0):
         #print(x)
         #print(self.acards)
-        if x > self.steps: return
+        if x >= self.steps: return
         #顺子
         k = 0
         for i in range(values.two.value):#小王以下均可顺子
@@ -43,11 +44,11 @@ class single_game(object):
                     # 出牌
                     for j in range(i, i - k, -1): self.acards[j] -= 1
                     self.strategy.append(list(range(i - k + 1, i + 1)))
-                    print(self.strategy)###
+                    #print(self.strategy)###
                     self.dfs(x + 1)
                     #回溯
                     for j in range(i, i - k, -1): self.acards[j] += 1
-                    print(self.strategy)###
+                    #print(self.strategy)###
                     del self.strategy[-1]
         #间隔单顺子
         k = 0
@@ -130,15 +131,15 @@ class single_game(object):
                 self.acards[i] -= 3 # 减去带牌
                 a = [i] * 3
                 self.strategy.append(a)###
-                print(self.strategy)
+                #print(self.strategy)
                 for j in range(values.ljoker.value + 1): # 带单张
                     if self.acards[j] == 0: continue # 无牌(无需考虑相同)
                     self.acards[j] -= 1 # 出牌
                     self.strategy[-1].append(j)
-                    print(self.strategy)###
+                    #print(self.strategy)###
                     self.dfs(x + 1)
                     self.acards[j] += 1 # 回溯
-                    print(self.strategy)###
+                    #print(self.strategy)###
                     del self.strategy[-1][-1]
                     
                 for j in range(values.sjoker.value): # 带一对
@@ -146,7 +147,7 @@ class single_game(object):
                     self.acards[j] -= 2
                     a = [j] * 2
                     self.strategy[-1].extend(a)
-                    print(self.strategy)
+                    #print(self.strategy)
                     self.dfs(x + 1)
                     self.acards[j] += 2
                     del self.strategy[-1][-2:]
@@ -156,12 +157,12 @@ class single_game(object):
                 self.acards[i] -= 3 # 先3带
                 a = [i] * 3
                 self.strategy.append(a)
-                print(self.strategy)
+                #print(self.strategy)
                 for j in range(values.ljoker.value + 1): # 带单张
                     if (self.acards[j] == 0) or (j == i): continue # 无牌或相同
                     self.acards[j] -= 1 # 出牌
                     self.strategy[-1].append(j)
-                    print(self.strategy)
+                    #print(self.strategy)
                     self.dfs(x + 1)
                     self.acards[j] += 1 # 回溯
                     del self.strategy[-1][-1]
@@ -170,7 +171,7 @@ class single_game(object):
                     self.acards[j] -= 2 #出对子
                     a = [j] * 2
                     self.strategy[-1].extend(a)
-                    print(self.strategy)
+                    #print(self.strategy)
                     self.dfs(x + 1)
                     self.acards[j] += 2 # 回溯
                     del self.strategy[-1][-2:]
@@ -216,7 +217,8 @@ class single_game(object):
             if self.acards[i]: 
                 x += 1
                 count += 1
-                self.strategy.append([i] * self.acards[i])
+                a = [i] * int(self.acards[i])
+                self.strategy.append(a)
         if (self.acards[values.sjoker.value]) or (self.acards[values.ljoker.value]): 
             x += 1
             count += 1
@@ -227,16 +229,25 @@ class single_game(object):
             else:
                 self.strategy.append([values.ljoker.value])
 
-        if self.steps > x: 
-            print(x)
-            print(self.strategy)
+        #if self.steps > x: 
+            #print(x)
+            #print(self.strategy)
         self.steps = min(self.steps, x)
         if count:
             del self.strategy[-count:]
               
     def dp(self):
         pass
-    
 
-single_game(54)
+if __name__ == "__main__":
+
+    n = 100
+    l = 23
+    #starttime = datetime.datetime.now()
+    for i in tqdm(range(n)):
+        single_game(l)
+    #endtime = datetime.datetime.now()
+    #time = (endtime - starttime).microseconds / n
+    #print("%d average run time = " % l, (time),  "ms")
+
 

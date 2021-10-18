@@ -44,10 +44,12 @@ class hand_cards(object):
     def __init__(self, n):
         self.cnum = n
         self.mcard = []
+        #self.seed = 2019011455
         self.random_card()
         self.sort_card()
 
     def random_card(self):
+        #random.seed(self.seed)
         pokers = []
         for i in range(1, 5):
             for j in range(values.sjoker.value):

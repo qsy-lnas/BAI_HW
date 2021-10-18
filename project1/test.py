@@ -10,9 +10,10 @@ b = a + a
 b.sort()
 c.append(b)
 print(c) """
-c = [[0, 1, 2, 3, 4], [0, 0, 0, 3], [1, 1, 1, 4], [2, 2, 2, 13]]
-del c[-2:]
-print(c)
+b = np.array([0, 1, 2, 3])
+a = [[1, 1, 1]]
+a.append([2] * b[2])
+print(a)
 if 1 and 0:
     print(1)
 elif 1:
