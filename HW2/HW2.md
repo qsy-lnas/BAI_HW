@@ -8,7 +8,7 @@
 
    值域：$D = x_i\in\{1, 2, 3, 4\}$
 
-2. 一元约束：$C_1 = \{\exists x_i = 2\};$
+2. 一元约束：$C_1 = \{\exists x_i = 2\}\&\{x_2 \neq 4, x_3 \neq 3, 4, x_4 \neq 3, 4\}$
 
    二元约束：$ C_2 = \left\{ \begin{aligned} 4 & =  max\{x_1, x_2\}, \\ 3 & = max\{x_2, x_3\}, \\ 2 & = max\{x_3, x_4\}, \\ 4 & = max\{x_4, x_5\};  \end{aligned} \right. $
 
