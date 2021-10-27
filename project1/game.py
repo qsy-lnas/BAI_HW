@@ -30,9 +30,9 @@ class single_game(object):
         self.renew_cards(n)
         
         '''for debugging'''
-        print("cards = ", self.acards)
-        print("steps = ", self.steps)
-        print("strategy:", self.best_strategy)
+        #print("cards = ", self.acards)
+        #print("steps = ", self.steps)
+        #print("strategy:", self.best_strategy)
     
     def renew_cards(self, n):
         '''
@@ -362,11 +362,12 @@ class single_game(object):
 if __name__ == "__main__":
 
     n = 100
-    l = 30
-    #starttime = datetime.datetime.now()
-    #for i in tqdm(range(n)):
+    l = 40
     s = single_game(l)
-    
+    #starttime = datetime.datetime.now()
+    for i in tqdm(range(n)):
+        s.renew_cards(l)
+    print("cards number = ", l)
     #endtime = datetime.datetime.now()
     #time = (endtime - starttime).microseconds / n
     #print("%d average run time = " % l, (time),  "ms")
