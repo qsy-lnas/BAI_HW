@@ -1,6 +1,7 @@
 import numpy as np
 import datetime
 from tqdm import tqdm
+import math
 
 from numpy.lib.function_base import append
 from card import card, hand_cards, values
@@ -20,7 +21,7 @@ class single_game(object):
         self.strategy = []
         self.steps = 15
         #print(self.acards) 
-        self.dfs()
+        self.dp()
         #print(self.steps)
     
     def card_in_np(self):
@@ -34,7 +35,7 @@ class single_game(object):
         #print(x)
         #print(self.acards)
         if x >= self.steps: return
-        #顺子
+        '''顺子'''
         k = 0
         for i in range(values.two.value):#小王以下均可顺子
             if self.acards[i] == 0: k = 0 # 顺子中断
@@ -50,7 +51,7 @@ class single_game(object):
                     for j in range(i, i - k, -1): self.acards[j] += 1
                     #print(self.strategy)###
                     del self.strategy[-1]
-        #间隔单顺子
+        '''间隔单顺子'''
         k = 0
         for q in range(2):
             for i in range(q, values.two.value, 2):
@@ -63,7 +64,7 @@ class single_game(object):
                         self.dfs(x + 1)
                         for j in range(i, i - 2 * k, -2): self.acards[j] += 1
                         del self.strategy[-1]
-        #双顺子
+        '''双顺子'''
         k = 0
         for i in range(values.two.value):
             if self.acards[i] < 2: k = 0
@@ -78,7 +79,7 @@ class single_game(object):
                     self.dfs(x + 1)
                     for j in range(i, i - k, -1): self.acards[j] += 2
                     del self.strategy[-1]
-        #间隔双顺子
+        '''间隔双顺子'''
         k = 0
         for q in range(2):
             for i in range(q, values.two.value, 2):
@@ -94,7 +95,7 @@ class single_game(object):
                         self.dfs(x + 1)
                         for j in range(i, i - 2 * k, -2): self.acards[j] += 2
                         del self.strategy[-1]
-        #三顺子
+        '''三顺子'''
         for i in range(values.two.value):
             if self.acards[i] < 3: k = 0;
             else:
@@ -108,7 +109,7 @@ class single_game(object):
                     self.dfs(x + 1)
                     for j in range(i, i - k, -1): self.acards[j] += 3
                     del self.strategy[-1]
-        #间隔三顺子
+        '''间隔三顺子'''
         for q in range(2):
             for i in range(q, values.two.value, 2):
                 if self.acards[i] < 3: k = 0;
@@ -125,7 +126,7 @@ class single_game(object):
                         self.dfs(x + 1)
                         for j in range(i, i - 2 * k, -2): self.acards[j] += 3
                         del self.strategy[-1]
-        #带牌
+        '''带牌'''
         for i in range(values.sjoker.value):#枚举小王以下的牌可以作为带牌的主体
             if self.acards[i] == 3:
                 self.acards[i] -= 3 # 减去带牌
@@ -237,7 +238,39 @@ class single_game(object):
             del self.strategy[-count:]
               
     def dp(self):
-        pass
+        '''dp[i, j, k, z, l] -> times[1, 2, 3, 4, joker]'''
+        dp = np.empty((16, 16, 16, 16, 3))
+        dp[:, :, :, :, :] = math.inf
+        dp[0, 0, 0, 0, 0] = 0
+        print(dp)
+        for z in range(16):
+            for k in range(16):
+                for i in range(16):
+                    for j in range(16):
+                        for l in range(3):
+                            x = 100
+                            if i > 0: x = min(x, dp[i - 1, j, k, z ,l] + 1)
+                            if j > 0: x = min(x, dp[i, j - 1, k, z, l] + 1)
+                            if k > 0: x = min(x, dp[i, j, k - 1, z, l] + 1)
+                            if z > 0: x = min(x, dp[i ,j ,k ,z - 1, l] + 1)
+                            if l > 0: x = min(x, dp[i, j, k, z, l - 1] + 1)
+                            if l > 1: x = min(x, dp[i, j, k, z, l - 2] + 1)
+                            '''三带一'''
+                            if i > 0 and k > 0: x = min(x, dp[i - 1, j, k - 1, z, l] + 1)
+                            if l > 0 and k > 0: x = min(x, dp[i, j, k - 1, z, l - 1] + 1)
+                            '''三带二'''
+                            if j > 0 and k > 0: x = min(x, dp[i, j - 1, k - 1, z, l] + 1)
+                            '''四带二'''
+                            if i > 1 and z > 0: x = min(x, dp[i - 2, j, k, z - 1, l] + 1)
+                            if i > 0 and z > 0 and l > 0: x = min(x, dp[i - 1, j, k, z - 1, l - 1]  +1)
+                            if l > 1 and z > 0: x = min(x, dp[i, j, k, z - 1, l - 2] + 1)
+                            #if j > 0 and z > 0: x = min(x, dp[i, j - 1, k, z - 1, l] + 1)
+                            if j > 1 and z > 0: x = min(x, dp[i, j - 2, k, z - 1, l] + 1)
+                            #if z > 1: x = min(x, dp][i, j, k, z - 2, l] + 1)
+                            if z > 0: x = min(x, dp[i + 1, j, k + 1, z - 1, l])
+                            if k > 0: x = min(x, dp[i + 1, j + 1, k - 1, z, l])
+                            dp[i, j, k, z, l] = min(x, dp[i, j, k ,z, l])
+
 
 if __name__ == "__main__":
 
