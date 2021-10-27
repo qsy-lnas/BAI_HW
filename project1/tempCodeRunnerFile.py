@@ -1,1 +1,0 @@
-print("cards = ", self.acards)
