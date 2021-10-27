@@ -14,12 +14,21 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(501, 434)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+        self.CardNumBox = QtWidgets.QSpinBox(self.centralwidget)
+        self.CardNumBox.setGeometry(QtCore.QRect(400, 180, 42, 22))
+        self.CardNumBox.setMinimum(1)
+        self.CardNumBox.setMaximum(54)
+        self.CardNumBox.setProperty("value", 1)
+        self.CardNumBox.setObjectName("CardNumBox")
+        self.CardWidget = QtWidgets.QWidget(self.centralwidget)
+        self.CardWidget.setGeometry(QtCore.QRect(80, 280, 301, 51))
+        self.CardWidget.setObjectName("CardWidget")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 501, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -31,4 +40,4 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "斗地主"))
