@@ -9,18 +9,20 @@ from card import card, hand_cards, values
 
 class single_game(object):
     def __init__(self, n):
-        #单人游戏总牌数
+        
+        '''单人游戏总牌数'''
         self.cnum = n
-        #单人游戏手牌
+        '''单人游戏手牌'''
         self.cards = hand_cards(self.cnum).mcard
-        #手牌分布数组
+        '''手牌分布数组'''
         self.acards = self.card_in_np()
         #self.acards = [4, 4, 4, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
         #self.acards = [4, 0, 4, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0]
-        #最佳策略与最短步数
+        '''最佳策略与最短步数'''
         self.strategy = []
         self.steps = 15
-        #print(self.acards) 
+        '''init dp to accelerate'''
+        self.dp = np.empty((16, 16, 16, 16, 3))
         self.dp()
         #print(self.steps)
     
@@ -239,7 +241,7 @@ class single_game(object):
               
     def dp(self):
         '''dp[i, j, k, z, l] -> times[1, 2, 3, 4, joker]'''
-        dp = np.empty((16, 16, 16, 16, 3))
+        
         dp[:, :, :, :, :] = math.inf
         dp[0, 0, 0, 0, 0] = 0
         print(dp)
