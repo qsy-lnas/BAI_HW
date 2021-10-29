@@ -67,6 +67,7 @@ class hand_cards(object):
         self.mcard.sort()
         #print(self.mcard)
 
-""" c = card(4, 4)
-b = card(2, 2)
-print(b) """
+if __name__ == "__main__":
+    """ c = card(4, 4)
+    b = card(2, 2)
+    print(b) """
