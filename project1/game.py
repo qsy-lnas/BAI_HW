@@ -29,8 +29,6 @@ class single_game(object):
         '''更新n'''
         self.renew_cards(n)
         
-        
-    
     def renew_cards(self, n):
         '''
         The function to change the cards number for single game\\
@@ -51,18 +49,19 @@ class single_game(object):
         self.cardsfordfs = []
         self.xfordfs = 0
         '''for debugging'''
-        print("cards = ", self.acards)
+        
         #self.acards = [4, 4, 4, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 1, 0]
         #self.acards = [4, 0, 4, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0]
         #self.acards = [1, 3, 3, 3, 3, 2, 3, 2, 1, 1, 2, 2, 3, 0, 1]
         #self.acards = [2, 2, 1, 1, 0, 1, 0, 3, 3, 2, 2, 2, 3, 0, 1]
         #self.acards = [0, 1, 1, 1, 1, 1, 3, 4, 0, 0 ,2, 0, 0, 0, 0]
-        self.cards = [3, 2, 3, 3, 3, 1, 0, 2, 2, 3, 2, 1, 3, 1, 1]
+        #self.acards = [3, 2, 3, 3, 3, 1, 0, 2, 2, 3, 2, 1, 3, 1, 1]
+        self.acards = [0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0]
         #[2. 0. 3. 3. 3. 2. 2. 4. 1. 3. 1. 2. 3. 1. 0.]
         self.dfs()
         self.dfs_for_else(self.xfordfs)
         '''for debugging'''
-        #print("cards = ", self.acards)
+        print("cards = ", self.acards)
         print("steps = ", self.steps)
         print("strategy:", self.best_strategy)
 
@@ -338,7 +337,7 @@ class single_game(object):
                 for i in range(14):
                     for j in range(14):
                         for l in range(3):
-                            x = 100
+                            x = 2019011455
                             if i > 0: x = min(x, self.dp[i - 1, j, k, z ,l] + 1)
                             if j > 0: x = min(x, self.dp[i, j - 1, k, z, l] + 1)
                             if k > 0: x = min(x, self.dp[i, j, k - 1, z, l] + 1)
@@ -369,8 +368,8 @@ if __name__ == "__main__":
     l = 30
     s = single_game(l)
     #starttime = datetime.datetime.now()
-    for i in tqdm(range(n)):
-        s.renew_cards(l)
+    #for i in tqdm(range(n)):
+    #    s.renew_cards(l)
     print("cards number = ", l)
     #endtime = datetime.datetime.now()
     #time = (endtime - starttime).microseconds / n
