@@ -10,7 +10,6 @@ from game import single_game
 
 class dgame(object):
     def __init__(self, n1 = 17, n2 = 17):
-
         '''类内变量'''
         self.cnum1 = n1
         self.cnum2 = n2
@@ -20,16 +19,11 @@ class dgame(object):
         self.player1 = player(n1, self.hcards.mcard1)
         self.player2 = player(n2, self.hcards.mcard2)
 
-
-        '''分别计算出牌策略'''
-
-        self.renew_cards(n1, n2)
-
-    def renew_cards(self, n1 = 17, n2 = 17):
+        
+    def start_game(self):
         '''
-        The function to change the cards number for double game\\
-        n1 for player1, n2 for player 2 \\
-        then you can immediate acquire the strategy\\
+        depend on the mcards1/2 to start the game
+        player1 will take first
         '''
         pass
 
