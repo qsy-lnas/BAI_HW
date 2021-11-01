@@ -5,7 +5,7 @@ from tqdm import tqdm
 import math
 
 from numpy.lib.function_base import append
-from card import card, hand_cards, values
+from utils import card, hand_cards, values
 
 
 class single_game(object):

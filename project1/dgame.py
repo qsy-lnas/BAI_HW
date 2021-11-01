@@ -5,7 +5,7 @@ from tqdm import tqdm
 import math
 
 from numpy.lib.function_base import append
-from card import card, hand_cards, values
+from utils import card, hand_cards, values
 
 class dgame(object):
     def __init__(self, n1  =17, n2 = 17):
@@ -20,7 +20,7 @@ class dgame(object):
         self.cards = []
 
         '''分别计算出牌策略'''
-        
+
 
 
 

@@ -67,6 +67,16 @@ class hand_cards(object):
         self.mcard.sort()
         #print(self.mcard)
 
+class dhand_cards(object):
+    def __init__(self, n1 = 17, n2 = 17):
+        self.cnum1 = n1
+        self.acards1 = []
+        self.cards = []
+
+        self.cnum2 = n2
+        self.acards = []
+        self.cards = []
+
 if __name__ == "__main__":
     """ c = card(4, 4)
     b = card(2, 2)
