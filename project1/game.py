@@ -28,6 +28,42 @@ class single_game(object):
         
         '''更新n'''
         self.renew_cards(n)
+
+    def set_cards_renew(self, n, cards):
+        '''
+        The function to change the cards number for single game\\
+        Only the cards number are need\\
+        then you can immediate acquire the strategy\\
+        '''
+        '''单人游戏总牌数'''
+        self.cnum = n
+        '''单人游戏手牌'''
+        self.cards = cards
+        '''手牌分布数组'''
+        self.acards = self.card_in_np()
+        '''计算策略'''
+        self.flag = 0
+        self.strategy = []
+        self.best_strategy = []
+        self.steps = 15
+        self.cardsfordfs = []
+        self.xfordfs = 0
+        '''for debugging'''
+        
+        #self.acards = [4, 4, 4, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 1, 0]
+        #self.acards = [4, 0, 4, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0]
+        #self.acards = [1, 3, 3, 3, 3, 2, 3, 2, 1, 1, 2, 2, 3, 0, 1]
+        #self.acards = [2, 2, 1, 1, 0, 1, 0, 3, 3, 2, 2, 2, 3, 0, 1]
+        #self.acards = [0, 1, 1, 1, 1, 1, 3, 4, 0, 0 ,2, 0, 0, 0, 0]
+        #self.acards = [3, 2, 3, 3, 3, 1, 0, 2, 2, 3, 2, 1, 3, 1, 1]
+        #self.acards = [0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0, 0]
+        #[2. 0. 3. 3. 3. 2. 2. 4. 1. 3. 1. 2. 3. 1. 0.]
+        self.dfs()
+        self.dfs_for_else(self.xfordfs)
+        '''for debugging'''
+        #print("cards = ", self.acards)
+        #print("steps = ", self.steps)
+        #print("strategy:", self.best_strategy)
         
     def renew_cards(self, n):
         '''
