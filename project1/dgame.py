@@ -21,6 +21,15 @@ class dgame(object):
 
         '''分别计算出牌策略'''
 
+        self.renew_cards(n1, n2)
+
+    def renew_cards(self, n1 = 17, n2 = 17):
+             '''
+        The function to change the cards number for double game\\
+        n1 for player1, n2 for player 2 \\
+        then you can immediate acquire the strategy\\
+        '''
+
 
 
 
