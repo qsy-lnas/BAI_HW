@@ -27,7 +27,7 @@ class dgame(object):
         player1 will take first
         '''
         
-        if n1 != self.cnum1 and n2 != self.cnum2:
+        if n1 != self.cnum1 or n2 != self.cnum2:
             print("...", end = '')
             self.cnum1 = n1
             self.cnum2 = n2
@@ -36,7 +36,7 @@ class dgame(object):
             self.player2 = player(n2, self.hcards.mcard2)
         
         print(end = '\r')
-        print('                                            ', end = '\r')
+        print('                                                 ', end = '\r')
         os.system('pause')
         print("Cards :   [3, 4, 5, 6, 7, 8, 9,10, J, Q, K, A, 2,sJ,lJ]")
         print("Player 1:", list(map(int, self.player1.acards.tolist())), self.player1.cnum_remain)
@@ -61,7 +61,7 @@ class dgame(object):
             last_output = output
             output = self.player2.play_card(last_output)
             print("Player 2 play cards:", output)
-            print("Player 2:", list(map(int, self.player2.acards.tolist())), self.player1.cnum_remain)
+            print("Player 2:", list(map(int, self.player2.acards.tolist())), self.player2.cnum_remain)
         print("\n")
         if len(self.player1.mcards) == 0:
             print("----------------------Player 1 Win---------------------")

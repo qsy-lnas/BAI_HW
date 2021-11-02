@@ -113,3 +113,6 @@ class dhand_cards(object):
         self.mcard1.sort()
         self.mcard2.sort()
 
+if __name__ == "__main__":
+    d = dhand_cards(2,2)
+    print(d.mcard1)
