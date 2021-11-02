@@ -17,8 +17,8 @@
    <widget class="QSpinBox" name="CardNumBox">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>60</y>
+      <x>190</x>
+      <y>10</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -40,29 +40,10 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>240</y>
+      <y>250</y>
       <width>381</width>
       <height>141</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>70</y>
-      <width>51</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>牌数</string>
-    </property>
-    <property name="textFormat">
-     <enum>Qt::AutoText</enum>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QWidget" name="gridLayoutWidget">
@@ -470,8 +451,8 @@
    <widget class="QPushButton" name="CalpushButton">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>120</y>
+      <x>330</x>
+      <y>200</y>
       <width>91</width>
       <height>41</height>
      </rect>
@@ -480,13 +461,23 @@
      <string>开始搜索</string>
     </property>
    </widget>
-   <widget class="QLabel" name="testlabel">
+   <widget class="QTextBrowser" name="textBrowser">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>180</y>
-      <width>81</width>
-      <height>41</height>
+      <x>0</x>
+      <y>50</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="test_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>290</y>
+      <width>211</width>
+      <height>111</height>
      </rect>
     </property>
     <property name="text">
@@ -499,20 +490,25 @@
  <resources/>
  <connections>
   <connection>
-   <sender>CardNumBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>CardWidget</receiver>
-   <slot>show()</slot>
+   <sender>CalpushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>search_begin()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>147</x>
-     <y>70</y>
+     <x>392</x>
+     <y>223</y>
     </hint>
     <hint type="destinationlabel">
-     <x>218</x>
-     <y>298</y>
+     <x>470</x>
+     <y>211</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>cnum_changed()</slot>
+  <slot>search_begin()</slot>
+  <slot>function_changed()</slot>
+ </slots>
 </ui>

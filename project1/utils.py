@@ -47,6 +47,7 @@ class card(object):
     def __init__(self, color, value):
        self.color = colors(color)
        self.value = values(value)
+       self.id = self.color.value * 15 + self.value.value
 
     def __repr__(self):
         return "<card.{}.{}>".format(self.color.name, self.value.name)
