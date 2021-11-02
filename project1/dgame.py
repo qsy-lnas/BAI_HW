@@ -28,7 +28,9 @@ class dgame(object):
         '''
         
         if n1 != self.cnum1 and n2 != self.cnum2:
-            print("Initializng... this may take a few seconds", end = '')
+            print("...", end = '')
+            self.cnum1 = n1
+            self.cnum2 = n2
             self.hcards = dhand_cards(n1, n2)
             self.player1 = player(n1, self.hcards.mcard1)
             self.player2 = player(n2, self.hcards.mcard2)
@@ -37,8 +39,8 @@ class dgame(object):
         print('                                            ', end = '\r')
         os.system('pause')
         print("Cards :   [3, 4, 5, 6, 7, 8, 9,10, J, Q, K, A, 2,sJ,lJ]")
-        print("Player 1:", list(map(int, self.player1.acards.tolist())))
-        print("Player 2:", list(map(int, self.player2.acards.tolist())))
+        print("Player 1:", list(map(int, self.player1.acards.tolist())), self.player1.cnum_remain)
+        print("Player 2:", list(map(int, self.player2.acards.tolist())), self.player2.cnum_remain)
         print("-----------------------Start Game----------------------")
         output = []
         last_output = [1]
@@ -46,29 +48,27 @@ class dgame(object):
             print("\n")
             print("-------------------Round for Player 1------------------")
             print("Cards :   [3, 4, 5, 6, 7, 8, 9,10, J, Q, K, A, 2,sJ,lJ]")
-            print("Player 1:", list(map(int, self.player1.acards.tolist())))
+            print("Player 1:", list(map(int, self.player1.acards.tolist())), self.player1.cnum_remain)
             last_output = output
             output = self.player1.play_card(last_output)
             print("Player 1 play cards:", output)
-            print("Player 1:", list(map(int, self.player1.acards.tolist())))
+            print("Player 1:", list(map(int, self.player1.acards.tolist())), self.player1.cnum_remain)
             if len(self.player1.mcards) == 0 or len(self.player2.mcards) == 0: break
             print("\n")
             print("-------------------Round for Player 2------------------")
             print("Cards :   [3, 4, 5, 6, 7, 8, 9,10, J, Q, K, A, 2,sJ,lJ]")
-            print("Player 2:", list(map(int, self.player2.acards.tolist())))
+            print("Player 2:", list(map(int, self.player2.acards.tolist())), self.player2.cnum_remain)
             last_output = output
             output = self.player2.play_card(last_output)
             print("Player 2 play cards:", output)
-            print("Player 2:", list(map(int, self.player2.acards.tolist())))
+            print("Player 2:", list(map(int, self.player2.acards.tolist())), self.player1.cnum_remain)
         print("\n")
         if len(self.player1.mcards) == 0:
             print("----------------------Player 1 Win---------------------")
         elif len(self.player2.mcards) == 0:
             print("----------------------Player 2 Win---------------------")
         print("------------------------Game End-----------------------")
-
-        
-
+     
 class player(object):
     def __init__(self, cnum = 0, mcards = []):
         '''
@@ -508,16 +508,23 @@ class player(object):
 
 
 if __name__ == "__main__":
-    """ #a = hand_cards(3)
-    b = hand_cards(20)
-    c = player(20, b.mcard)
-
-    print(c.card_to_array(b.mcard))
-    print(c.play_card([]))
-    print(c.card_to_array(b.mcard)) """
-    print("Initializng... this may take a few seconds", end = '')
+    
+    c1 = int(input("You want set the number of cards for player 1: "))
+    c2 = int(input("You want set the number of cards for player 2: "))
+    print("Initializing... this may take a few seconds", end = '')
     d = dgame()
-    d.start_game()
+    x = 1
+    while x == 1:
+        d.start_game(c1, c2)
+        inp = 0
+        while inp != 'n' and inp != 'y':
+            inp = input("Do you want to continue[y/n]:")
+        if inp == 'n': x = 0
+        else: 
+            c1 = int(input("You want set the number of cards for player 1: "))
+            c2 = int(input("You want set the number of cards for player 2: "))
+        
+
     #os.system('pause')
 
 
