@@ -42,7 +42,7 @@ class dgame(object):
         print("-----------------------Start Game----------------------")
         output = []
         last_output = [1]
-        while ~(len(output) == len(last_output) == 0):
+        while len(self.player1.mcards) != 0 and len(self.player2.mcards) != 0:
             print("\n")
             print("-------------------Round for Player 1------------------")
             print("Cards :   [3, 4, 5, 6, 7, 8, 9,10, J, Q, K, A, 2,sJ,lJ]")
@@ -51,7 +51,7 @@ class dgame(object):
             output = self.player1.play_card(last_output)
             print("Player 1 play cards:", output)
             print("Player 1:", list(map(int, self.player1.acards.tolist())))
-            if len(output) == len(last_output) == 0: break
+            if len(self.player1.mcards) == 0 or len(self.player2.mcards) == 0: break
             print("\n")
             print("-------------------Round for Player 2------------------")
             print("Cards :   [3, 4, 5, 6, 7, 8, 9,10, J, Q, K, A, 2,sJ,lJ]")
@@ -60,6 +60,11 @@ class dgame(object):
             output = self.player2.play_card(last_output)
             print("Player 2 play cards:", output)
             print("Player 2:", list(map(int, self.player2.acards.tolist())))
+        print("\n")
+        if len(self.player1.mcards) == 0:
+            print("----------------------Player 1 Win---------------------")
+        elif len(self.player2.mcards) == 0:
+            print("----------------------Player 2 Win---------------------")
         print("------------------------Game End-----------------------")
 
         
@@ -108,15 +113,18 @@ class player(object):
         if len(ecards) == 0:
             self.sg.set_cards_renew(self.cnum, self.mcards)
             str = self.sg.best_strategy[0]
-            flag = 0
             for i in range(len(str)):
                 self.acards[str[i]] -= 1
-            for i in range(len(self.mcards)):
-                if self.mcards[i - flag].value.value == str[flag]:
-                    ret.append(self.mcards[i - flag])
-                    del self.mcards[i - flag]
-                    flag += 1
-                    if flag == len(str): break
+            flag = 0
+            while flag < len(str):
+                flag0 = 0
+                for i in range(len(self.mcards)):
+                    if self.mcards[i - flag0].value.value == str[flag]:
+                        ret.append(self.mcards[i - flag0])
+                        del self.mcards[i - flag0]
+                        flag += 1
+                        flag0 += 1
+                        if flag == len(str): break
             self.cnum_remain = len(self.mcards)
             return ret
 
