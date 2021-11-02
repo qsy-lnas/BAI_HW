@@ -3,6 +3,7 @@ import datetime
 import copy
 from tqdm import tqdm
 import math
+import os
 
 from numpy.lib.function_base import append
 from utils import card, hand_cards, values, dhand_cards
@@ -20,12 +21,48 @@ class dgame(object):
         self.player2 = player(n2, self.hcards.mcard2)
 
         
-    def start_game(self):
+    def start_game(self, n1 = 17, n2 = 17):
         '''
         depend on the mcards1/2 to start the game
         player1 will take first
         '''
-        pass
+        
+        if n1 != self.cnum1 and n2 != self.cnum2:
+            print("Initializng... this may take a few seconds", end = '')
+            self.hcards = dhand_cards(n1, n2)
+            self.player1 = player(n1, self.hcards.mcard1)
+            self.player2 = player(n2, self.hcards.mcard2)
+        
+        print(end = '\r')
+        print('                                            ', end = '\r')
+        os.system('pause')
+        print("Cards :   [3, 4, 5, 6, 7, 8, 9,10, J, Q, K, A, 2,sJ,lJ]")
+        print("Player 1:", list(map(int, self.player1.acards.tolist())))
+        print("Player 2:", list(map(int, self.player2.acards.tolist())))
+        print("-----------------------Start Game----------------------")
+        output = []
+        last_output = [1]
+        while ~(len(output) == len(last_output) == 0):
+            print("\n")
+            print("-------------------Round for Player 1------------------")
+            print("Cards :   [3, 4, 5, 6, 7, 8, 9,10, J, Q, K, A, 2,sJ,lJ]")
+            print("Player 1:", list(map(int, self.player1.acards.tolist())))
+            last_output = output
+            output = self.player1.play_card(last_output)
+            print("Player 1 play cards:", output)
+            print("Player 1:", list(map(int, self.player1.acards.tolist())))
+            if len(output) == len(last_output) == 0: break
+            print("\n")
+            print("-------------------Round for Player 2------------------")
+            print("Cards :   [3, 4, 5, 6, 7, 8, 9,10, J, Q, K, A, 2,sJ,lJ]")
+            print("Player 2:", list(map(int, self.player2.acards.tolist())))
+            last_output = output
+            output = self.player2.play_card(last_output)
+            print("Player 2 play cards:", output)
+            print("Player 2:", list(map(int, self.player2.acards.tolist())))
+        print("------------------------Game End-----------------------")
+
+        
 
 class player(object):
     def __init__(self, cnum = 0, mcards = []):
@@ -72,6 +109,8 @@ class player(object):
             self.sg.set_cards_renew(self.cnum, self.mcards)
             str = self.sg.best_strategy[0]
             flag = 0
+            for i in range(len(str)):
+                self.acards[str[i]] -= 1
             for i in range(len(self.mcards)):
                 if self.mcards[i - flag].value.value == str[flag]:
                     ret.append(self.mcards[i - flag])
@@ -90,7 +129,7 @@ class player(object):
                     self.acards[x[i]] -= 1
                     for j in range(len(self.mcards)):
                         if self.mcards[j].value.value == x[i]:
-                            ret = self.mcards[j]
+                            ret.append(self.mcards[j])
                             del self.mcards[j]
                             break
                     self.cnum_remain = len(self.mcards)
@@ -461,13 +500,18 @@ class player(object):
 
 
 if __name__ == "__main__":
-    #a = hand_cards(3)
+    """ #a = hand_cards(3)
     b = hand_cards(20)
     c = player(20, b.mcard)
 
     print(c.card_to_array(b.mcard))
     print(c.play_card([]))
-    print(c.card_to_array(b.mcard))
+    print(c.card_to_array(b.mcard)) """
+    print("Initializng... this may take a few seconds", end = '')
+    d = dgame()
+    d.start_game()
+    #os.system('pause')
+
 
 
 
