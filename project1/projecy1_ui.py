@@ -3,7 +3,8 @@ import sys
 from PyQt5 import QtGui, QtWidgets
 from PyQt5.QtWidgets import QLabel, QWidget, QInputDialog, QPushButton, QApplication, QMessageBox, QTextBrowser
 import Ui_main
-from game import single_game 
+from game import single_game
+from utils import card, values 
 
 Ui_MainWindow = Ui_main.Ui_MainWindow
 
@@ -14,15 +15,17 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
         '''
         self.sg = single_game()
         self.totalcard = [0] * 73
+        self.playedcard = [0] * 25
+        self.cardnum = [0] * 15
         QtWidgets.QMainWindow.__init__(self)
         '''主界面对象初始化'''
         Ui_MainWindow.__init__(self)
         '''配置主界面对象'''
         self.setupUi(self)
-        self.card_init()
+        self.my_init()
         self.card_hide()
 
-    def card_init(self):
+    def my_init(self):
         self.totalcard[13] = self.card_13
         self.totalcard[14] = self.card_14
         self.totalcard[15] = self.card_15
@@ -77,13 +80,29 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
         self.totalcard[70] = self.card_70
         self.totalcard[71] = self.card_71
         self.totalcard[72] = self.card_72
-        
+        self.cardnum[0] = self.spinBox_0
+        self.cardnum[1] = self.spinBox_1
+        self.cardnum[2] = self.spinBox_2
+        self.cardnum[3] = self.spinBox_3
+        self.cardnum[4] = self.spinBox_4
+        self.cardnum[5] = self.spinBox_5
+        self.cardnum[6] = self.spinBox_6
+        self.cardnum[7] = self.spinBox_7
+        self.cardnum[8] = self.spinBox_8
+        self.cardnum[9] = self.spinBox_9
+        self.cardnum[10] = self.spinBox_10
+        self.cardnum[11] = self.spinBox_11
+        self.cardnum[12] = self.spinBox_12
+        self.cardnum[13] = self.spinBox_13
+        self.cardnum[14] = self.spinBox_14
+
     def card_hide(self):
         for i in range(len(self.totalcard)):
             if self.totalcard[i] == 0: continue
             self.totalcard[i].setVisible(False)
         self.PlaycardButton.setVisible(False)
         self.PlaycardButton.setEnabled(False)
+        self.playedcard = [0] * 25
 
     def card_show(self):
         for i in range(len(self.sg.cards)):
@@ -91,18 +110,54 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
             self.totalcard[self.sg.cards[i].id].raise_()
             self.totalcard[self.sg.cards[i].id].setVisible(True)
 
+    def show_single_card(self, id, i):
+        self.totalcard[id].move(10 + 18 * i, 330)
+        self.totalcard[id].raise_()
+        self.totalcard[id].setVisible(True)
 
     def search_begin(self):
         self.CalpushButton.setEnabled(False)
         type = self.comboBox.currentIndex()
         self.card_hide()
-        if type == 0: # no score; set num
+        '''no score; set num'''
+        if type == 0: 
             cnum = self.CardNumBox.value()
             self.sg.renew_cards(cnum)
             for i in range(cnum):
                 self.totalcard[self.sg.cards[i].id].move(10 + 18 * i, 250)
                 self.totalcard[self.sg.cards[i].id].raise_()
                 self.totalcard[self.sg.cards[i].id].setVisible(True)
+        '''no score; set cards'''
+        if type == 1:
+            cards = [0] * 15
+            mcards = []
+            for i in range(values.ljoker.value + 1):
+                cards[i] = self.cardnum[i].value()
+            '''2 以下'''
+            for i in range(values.sjoker.value): 
+                for j in range(cards[i]):
+                    a = card(j + 1, i)
+                    mcards.append(a)
+            '''单独处理大小王'''
+            for i in range(values.sjoker.value, values.ljoker.value + 1):
+                if cards[i] == 1: 
+                    a = card(0, i)
+                    mcards.append(a)
+            #print(mcards)
+            self.sg.set_cards_renew(len(mcards), mcards)
+            print(self.sg.cards)
+            print(self.sg.acards)
+            print(self.sg.best_strategy)
+            for i in range(len(mcards)):
+                self.totalcard[self.sg.cards[i].id].move(10 + 18 * i, 250)
+                self.totalcard[self.sg.cards[i].id].raise_()
+                self.totalcard[self.sg.cards[i].id].setVisible(True)
+        '''with score; set num'''
+        if type == 2:
+            pass
+        '''with score; set cards'''
+        if type == 3: 
+            pass            
 
 
 
@@ -111,11 +166,28 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
         self.PlaycardButton.setEnabled(True)
             
     def play_card(self):
-        if len(self.sg.best_strategy) == 0: 
+        if len(self.sg.cards) == 0: 
             self.card_hide()
-
+            return 
+        i = 0
+        while type(self.playedcard[i]) != int:
+            self.totalcard[self.playedcard[i].id].setVisible(False)
+            self.playedcard[i] = 0
+            i += 1
         a = self.sg.best_strategy[0]
-        
+        flag = 0
+        while flag < len(a):
+            flag0 = 0
+            for i in range(len(self.sg.cards)):
+                if self.sg.cards[i - flag0].value.value == a[flag]:
+                    self.show_single_card(self.sg.cards[i - flag0].id, flag)
+                    self.playedcard[flag] = self.sg.cards[i - flag0]
+                    del self.sg.cards[i - flag0]
+                    flag += 1
+                    flag0 += 1
+                    if flag == len(a): break
+        del self.sg.best_strategy[0]
+
 
                     
 

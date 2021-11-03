@@ -15,6 +15,8 @@ class single_game(object):
         self.cnum = n
         self.acards = []
         self.cards = []
+        self.score = 0
+        self.value = 0
         '''init dp to accelerate'''
         self.dp = np.empty((16, 16, 16, 16, 3))
         self.init_dp()
@@ -38,7 +40,7 @@ class single_game(object):
         '''单人游戏总牌数'''
         self.cnum = n
         '''单人游戏手牌'''
-        self.cards = cards
+        self.cards = copy.deepcopy(cards)
         '''手牌分布数组'''
         self.acards = self.card_in_np()
         '''计算策略'''
@@ -263,6 +265,7 @@ class single_game(object):
                     self.strategy[-1].append(j)
                     #print(self.strategy)###
                     self.dfs_for_else(x + 1)
+                    if self.flag == 1: return 
                     self.cardsfordfs[j] += 1 # 回溯
                     #print(self.strategy)###
                     del self.strategy[-1][-1]
@@ -274,6 +277,7 @@ class single_game(object):
                     self.strategy[-1].extend(a)
                     #print(self.strategy)
                     self.dfs_for_else(x + 1)
+                    if self.flag == 1: return 
                     self.cardsfordfs[j] += 2
                     del self.strategy[-1][-2:]
                 self.cardsfordfs[i] += 3 # 回溯
@@ -289,6 +293,7 @@ class single_game(object):
                     self.strategy[-1].append(j)
                     #print(self.strategy)
                     self.dfs_for_else(x + 1)
+                    if self.flag == 1: return 
                     self.cardsfordfs[j] += 1 # 回溯
                     del self.strategy[-1][-1]
                 for j in range(values.sjoker.value): # 带一对
@@ -298,6 +303,7 @@ class single_game(object):
                     self.strategy[-1].extend(a)
                     #print(self.strategy)
                     self.dfs_for_else(x + 1)
+                    if self.flag == 1: return 
                     self.cardsfordfs[j] += 2 # 回溯
                     del self.strategy[-1][-2:]
                 self.cardsfordfs[i] += 3 # 回溯
@@ -316,6 +322,7 @@ class single_game(object):
                         self.cardsfordfs[m] -= 1 #出第二张牌
                         self.strategy[-1].append(m)
                         self.dfs_for_else(x + 1)
+                        if self.flag == 1: return 
                         self.cardsfordfs[m] += 1 # 回溯
                         del self.strategy[-1][-1]
                     self.cardsfordfs[j] += 1 # 回溯
@@ -331,6 +338,7 @@ class single_game(object):
                         a = [m] * 2
                         self.strategy[-1].extend(a)
                         self.dfs_for_else(x + 1)
+                        if self.flag == 1: return 
                         self.cardsfordfs[m] += 2
                         del self.strategy[-1][-2:]
                     self.cardsfordfs[j] += 2
@@ -389,26 +397,132 @@ class single_game(object):
                             if i > 1 and z > 0: x = min(x, self.dp[i - 2, j, k, z - 1, l] + 1)
                             if i > 0 and z > 0 and l > 0: x = min(x, self.dp[i - 1, j, k, z - 1, l - 1]  +1)
                             if l > 1 and z > 0: x = min(x, self.dp[i, j, k, z - 1, l - 2] + 1)
-                            if j > 0 and z > 0: x = min(x, self.dp[i, j - 1, k, z - 1, l] + 1)
+                            #if j > 0 and z > 0: x = min(x, self.dp[i, j - 1, k, z - 1, l] + 1)
                             if j > 1 and z > 0: x = min(x, self.dp[i, j - 2, k, z - 1, l] + 1)
-                            if z > 1: x = min(x, self.dp[i, j, k, z - 2, l] + 1)
+                            #if z > 1: x = min(x, self.dp[i, j, k, z - 2, l] + 1)
                             '''*拆牌*'''
                             if z > 0: x = min(x, self.dp[i + 1, j, k + 1, z - 1, l])
                             if k > 0: x = min(x, self.dp[i + 1, j + 1, k - 1, z, l])
                             self.dp[i, j, k, z, l] = min(x, self.dp[i, j, k ,z, l])
 
+    def dfs_value(self, x = 0, score = 0):
+        '''顺子'''
+        k = 0
+        for i in range(values.two.value):#小王以下均可顺子
+            if self.acards[i] == 0: k = 0 # 顺子中断
+            else: # 通过回溯遍历不同长度的顺子
+                k += 1
+                if k >= 5:
+                    for p in range(k, 4, -1):
+                        # 出牌
+                        for j in range(i, i - p, -1): self.acards[j] -= 1
+                        self.strategy.append(list(range(i - p + 1, i + 1)))
+                        #print(self.strategy)###
+                        self.dfs(x + 1)
+                        #回溯
+                        for j in range(i, i - p, -1): self.acards[j] += 1
+                        #print(self.strategy)###
+                        del self.strategy[-1]
+        '''间隔单顺子'''
+        for q in range(2):
+            k = 0
+            for i in range(q, values.two.value, 2):
+                if self.acards[i] == 0: k = 0 # 顺子中断
+                else:
+                    k += 1
+                    if k >= 5:
+                        for p in range(k, 4, -1):
+                            for j in range(i, i - 2 * p, -2): self.acards[j] -= 1
+                            self.strategy.append(list(range(i - 2 * p + 2, i + 2, 2)))
+                            self.dfs(x + 1)
+                            for j in range(i, i - 2 * p, -2): self.acards[j] += 1
+                            del self.strategy[-1]
+        '''双顺子'''
+        k = 0
+        for i in range(values.two.value):
+            if self.acards[i] < 2: k = 0
+            else:
+                k += 1
+                if k >= 3:
+                    for p in range(k, 2, -1):
+                        for j in range(i, i - p, -1): self.acards[j] -= 2
+                        a = list(range(i - p + 1, i + 1))
+                        b = a + a
+                        b.sort()
+                        self.strategy.append(b)
+                        self.dfs(x + 1)
+                        for j in range(i, i - p, -1): self.acards[j] += 2
+                        del self.strategy[-1]
+        '''间隔双顺子'''
+        for q in range(2):
+            k = 0
+            for i in range(q, values.two.value, 2):
+                if self.acards[i] < 2: k = 0
+                else:
+                    k += 1
+                    if k >= 3:
+                        for p in range(k, 2, -1):
+                            for j in range(i, i - 2 * p, -2): self.acards[j] -= 2
+                            a = list(range(i - 2 * p + 2, i + 2, 2))
+                            b = a + a
+                            b.sort()
+                            self.strategy.append(b)
+                            self.dfs(x + 1)
+                            for j in range(i, i - 2 * p, -2): self.acards[j] += 2
+                            del self.strategy[-1]
+        '''三顺子'''
+        k = 0
+        for i in range(values.two.value):
+            if self.acards[i] < 3: k = 0;
+            else:
+                k += 1
+                if k >= 2:
+                    for p in range(k, 1, -1):
+                        for j in range(i, i - p, -1): self.acards[j] -= 3
+                        a = list(range(i - p + 1, i + 1))
+                        b = a + a + a
+                        b.sort()
+                        self.strategy.append(b)
+                        self.dfs(x + 1)
+                        for j in range(i, i - p, -1): self.acards[j] += 3
+                        del self.strategy[-1]
+        '''间隔三顺子'''
+        for q in range(2):
+            k = 0
+            for i in range(q, values.two.value, 2):
+                if self.acards[i] < 3: k = 0;
+                else:
+                    k += 1
+                    if k >= 2:
+                        for p in range(k, 1, -1):
+                            for j in range(i, i - 2 * p, -2): self.acards[j] -= 3
+                            a = list(range(i - 2 * p + 2, i + 2, 2))
+                            b = a + a + a
+                            b.sort()
+                            #print(b, self.acards)
+                            self.strategy.append(b)
+                            
+                            self.dfs(x + 1)
+                            for j in range(i, i - 2 * p, -2): self.acards[j] += 3
+                            del self.strategy[-1]
 
 if __name__ == "__main__":
 
-    n = 1000
+    """ n = 1000
     l = 25
     s = single_game(l)
     #starttime = datetime.datetime.now()
     for i in tqdm(range(n)):
         s.renew_cards(l)
-    print("cards number = ", l)
+    print("cards number = ", l) """
     #endtime = datetime.datetime.now()
     #time = (endtime - starttime).microseconds / n
     #print("%d average run time = " % l, (time),  "ms")
+    sg = single_game()
+    m = []
+    for i in range(8):
+        c = card(i % 4, i // 4)
+        m.append(c)
 
+    sg.set_cards_renew(len(m), m)
 
