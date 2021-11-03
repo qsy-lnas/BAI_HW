@@ -127,7 +127,6 @@ class player(object):
                         if flag == len(str): break
             self.cnum_remain = len(self.mcards)
             return ret
-
         elif len(ecards) == 1:
             '''找到有单牌的牌号'''
             x = np.where(self.acards == 1)[0]
@@ -196,6 +195,13 @@ class player(object):
                         return ret
                     else: continue
             else: # 是三带一
+                '''找到有单牌的牌号'''
+                x = np.where(self.acards == 1)[0]
+                '''出最小的一张'''
+                #无单牌可带
+                if len(x) == 0: 
+                    self.cnum_remain = len(self.mcards)
+                    return []
                 '''找到有三牌的牌号'''
                 x = np.where(self.acards == 3)[0]
                 '''出牌'''
@@ -234,11 +240,19 @@ class player(object):
                         return ret
         elif len(ecards) == 5:
             if ecards[0] == ecards[1]: # 是三带二
+                '''找到有单牌的牌号'''
+                x = np.where(self.acards == 2)[0]
+                '''出最小的一对'''
+                #无对牌可带
+                if len(x) == 0: 
+                    self.cnum_remain = len(self.mcards)
+                    return []
                 '''找到有三牌的牌号'''
                 x = np.where(self.acards == 3)[0]
                 '''出牌'''
                 for i in range(len(x)):
                     if x[i] > ecards[0]:
+
                         self.acards[x[i]] -= 3
                         flag = 0 #记录删除了几张牌
                         for j in range(len(self.mcards)):
@@ -311,6 +325,13 @@ class player(object):
                                 return ret
         elif ecards[0] == ecards[1] == ecards[2] == ecards[3]: # 
             if len(ecards) == 6: # 四带二
+                '''找到有单牌的牌号'''
+                x = np.where(self.acards == 1)[0]
+                '''出最小的两个'''
+                #无对牌可带
+                if len(x) <= 1: 
+                    self.cnum_remain = len(self.mcards)
+                    return []
                 '''找到有4牌的牌号'''
                 x = np.where(self.acards == 4)[0]
                 '''出牌'''
@@ -351,6 +372,13 @@ class player(object):
                         self.cnum_remain = len(self.mcards)
                         return ret
             else: # 四带二对
+                '''找到有2张的牌号'''
+                x = np.where(self.acards == 2)[0]
+                '''出最小的两对'''
+                #无对牌可带
+                if len(x) <= 1: 
+                    self.cnum_remain = len(self.mcards)
+                    return []
                 '''找到有4牌的牌号'''
                 x = np.where(self.acards == 4)[0]
                 '''出牌'''
