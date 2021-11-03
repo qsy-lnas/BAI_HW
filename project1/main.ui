@@ -460,7 +460,7 @@
    <widget class="QPushButton" name="CalpushButton">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>280</x>
       <y>200</y>
       <width>91</width>
       <height>41</height>
@@ -560,7 +560,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>330</y>
+      <y>300</y>
       <width>50</width>
       <height>70</height>
      </rect>
@@ -768,8 +768,8 @@
    <widget class="QLabel" name="card_30">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>280</y>
+      <x>10</x>
+      <y>340</y>
       <width>50</width>
       <height>71</height>
      </rect>
@@ -1509,8 +1509,8 @@
    <widget class="QPushButton" name="PlaycardButton">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>260</y>
+      <x>420</x>
+      <y>200</y>
       <width>51</width>
       <height>41</height>
      </rect>
@@ -1553,6 +1553,22 @@
     <hint type="destinationlabel">
      <x>472</x>
      <y>368</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>function_changed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>137</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>160</x>
+     <y>266</y>
     </hint>
    </hints>
   </connection>

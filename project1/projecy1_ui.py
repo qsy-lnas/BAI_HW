@@ -17,6 +17,7 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
         self.totalcard = [0] * 73
         self.playedcard = [0] * 25
         self.cardnum = [0] * 15
+        self.warned = 0
         QtWidgets.QMainWindow.__init__(self)
         '''主界面对象初始化'''
         Ui_MainWindow.__init__(self)
@@ -24,6 +25,7 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.my_init()
         self.card_hide()
+        self.textBrowser.setText("Welcome to the program, press Start Search to start")
 
     def my_init(self):
         self.totalcard[13] = self.card_13
@@ -121,8 +123,11 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
         self.card_hide()
         '''no score; set num'''
         if type == 0: 
+            self.warned = 0
             cnum = self.CardNumBox.value()
+            self.textBrowser.setText("Randomly generate %d cards, press Play Card to continue"%cnum)
             self.sg.renew_cards(cnum)
+            self.textBrowser.append("The min steps is %d"%int(self.sg.steps))
             for i in range(cnum):
                 self.totalcard[self.sg.cards[i].id].move(10 + 18 * i, 250)
                 self.totalcard[self.sg.cards[i].id].raise_()
@@ -143,21 +148,65 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
                 if cards[i] == 1: 
                     a = card(0, i)
                     mcards.append(a)
-            #print(mcards)
+            if len(mcards) > 24 and self.warned == 0:
+                
+                self.textBrowser.setText("Warning: You choose too many cards")
+                self.textBrowser.append("If you still want to use these cards, click one more time to search")
+                self.warned = 1
+                self.CalpushButton.setEnabled(True)
+                return
+            if self.warned == 1: self.warned = 0
+            self.textBrowser.setText("you select %d cards, press Play Card to continue"%len(mcards))
             self.sg.set_cards_renew(len(mcards), mcards)
-            print(self.sg.cards)
-            print(self.sg.acards)
-            print(self.sg.best_strategy)
+            self.textBrowser.append("The min steps is %d"%int(self.sg.steps))
+            #print(self.sg.cards)
+            #print(self.sg.acards)
+            #print(self.sg.best_strategy)
             for i in range(len(mcards)):
                 self.totalcard[self.sg.cards[i].id].move(10 + 18 * i, 250)
                 self.totalcard[self.sg.cards[i].id].raise_()
                 self.totalcard[self.sg.cards[i].id].setVisible(True)
         '''with score; set num'''
         if type == 2:
-            pass
+            self.warned = 0
+            cnum = self.CardNumBox.value()
+            self.sg.renew_cards_value(cnum)
+            self.textBrowser.setText("Randomly generate %d cards, press Play Card to continue"%cnum)
+            self.textBrowser.append("The max score is %.2f" % self.sg.minvalue)
+            for i in range(cnum):
+                self.totalcard[self.sg.cards[i].id].move(10 + 18 * i, 250)
+                self.totalcard[self.sg.cards[i].id].raise_()
+                self.totalcard[self.sg.cards[i].id].setVisible(True)
         '''with score; set cards'''
         if type == 3: 
-            pass            
+            cards = [0] * 15
+            mcards = []
+            for i in range(values.ljoker.value + 1):
+                cards[i] = self.cardnum[i].value()
+            '''2 以下'''
+            for i in range(values.sjoker.value): 
+                for j in range(cards[i]):
+                    a = card(j + 1, i)
+                    mcards.append(a)
+            '''单独处理大小王'''
+            for i in range(values.sjoker.value, values.ljoker.value + 1):
+                if cards[i] == 1: 
+                    a = card(0, i)
+                    mcards.append(a)
+            if len(mcards) >= 20 and self.warned == 0:
+                self.textBrowser.setText("##--!--!--Warning--!--!--## You choose too many cards")
+                self.textBrowser.append("If you still want to use these cards, click one more time to search")
+                self.warned = 1
+                self.CalpushButton.setEnabled(True)
+                return
+            if self.warned == 1: self.warned = 0
+            self.textBrowser.setText("you select %d cards, press Play Card to continue"%len(mcards))
+            self.sg.set_cards_renew_value(len(mcards), mcards)
+            self.textBrowser.append("The max score is %d"%int(self.sg.minvalue))
+            for i in range(len(mcards)):
+                self.totalcard[self.sg.cards[i].id].move(10 + 18 * i, 250)
+                self.totalcard[self.sg.cards[i].id].raise_()
+                self.totalcard[self.sg.cards[i].id].setVisible(True)         
 
 
 
@@ -167,6 +216,7 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
             
     def play_card(self):
         if len(self.sg.cards) == 0: 
+            self.textBrowser.append("----Play Card finished----")
             self.card_hide()
             return 
         i = 0
@@ -188,8 +238,17 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
                     if flag == len(a): break
         del self.sg.best_strategy[0]
 
-
-                    
+    def function_changed(self):
+        self.warned = 0
+        type = self.comboBox.currentIndex()
+        if type == 0:
+            self.textBrowser.setText("You changed the function to [set numbers, no scores]")
+        elif type == 1:
+            self.textBrowser.setText("You changed the function to [set cards, no scores]")
+        elif type == 2:
+            self.textBrowser.setText("You changed the function to [set numbers, with scores]")
+        elif type == 3:
+            self.textBrowser.setText("You changed the function to [set cards, with scores]")
 
 
 
