@@ -23,6 +23,7 @@
    \neg \ \exist x \ [PN(x) <  NN(x)]\\
    \forall x\ [PN(x) > \ NN(x)]\\
    PN(x): positive\ number;\ NN(x):\ negative\ number\\
+   for\ example: PN(x) = |x|, NN(x) = -|x|
    $$
 
    $$
@@ -57,11 +58,11 @@
 $$
 & \forall x\ [N(x) \Rightarrow (I(x)\wedge GZ(x))]\\
 & \forall x\ [I(x) \Rightarrow (O(x) \vee E(x))]\\
-& \forall x\ [S(E(x)) \Rightarrow I(x)]\\
+& \forall x\ [E(x) \Rightarrow I(S(x)]\\
 $$
 目标：
 $$
-\forall x\ [N(x) \Rightarrow (O(x) \vee S^{-1}(I(x)))]\\
+\forall x\ [N(x) \Rightarrow (O(x) \vee I(S(x)))]\\
 $$
 证明：
 
@@ -71,20 +72,21 @@ $$
 &\neg N(x) \vee I(x) & 1\\
 &\neg N(x) \vee GZ(x)& 2\\
 &\neg I(x) \vee O(x) \vee E(x) & 3\\
-&\neg S(E(x)) \vee I(x) & 4\\
-&\neg S^{-1}(I(x)) & 5\\
+&\neg E(x) \vee I(S(x)) & 4\\
+&\neg I(S(x)) & 5\\
 &\neg O(x) & 6\\
-&N(x) & 7\\
-&[S^{-1}(I(x)) \iff E(x)]
+&N(x_0) & 7\\
+&[S^{-1}(I(x_0)) \iff E(x_0)]
 \end{align}
 $$
 归结：
 $$
 \begin{align}
-1, 7: & I(x)\\
-3: & E(x) \vee O(x)\\
-6: & E(x)\\
-5: & 空语句\\
+1, 7: & I(x_0)\\
+3: & E(x_0) \vee O(x_0)\\
+6: & E(x_0)\\
+4: & I(s(x_0))\\
+5: & 空语句 \\
 原式得证
 \end{align}
 $$
