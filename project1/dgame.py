@@ -539,7 +539,7 @@ if __name__ == "__main__":
     
     c1 = int(input("You want set the number of cards for player 1: "))
     c2 = int(input("You want set the number of cards for player 2: "))
-    print("Initializing... this may take a few seconds", end = '')
+    print("Initializing... this may take a few seconds", end = '...')
     d = dgame()
     x = 1
     while x == 1:
