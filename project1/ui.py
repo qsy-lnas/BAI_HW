@@ -70,6 +70,7 @@ class mainWindow(QWidget):
             text, ok = QInputDialog.getText(self, '随机发牌', '输入发牌数')
             if ok:
                 self.randCardGenerateUI(int(text))
+                self.sg_cardnumber = int(text)
                 self.textOutput.append('请点击开始求取最小步方法')
             else:
                 return
@@ -80,7 +81,7 @@ class mainWindow(QWidget):
                 self.manualCardList = []
                 self.manualCardIndex = []
                 self.textOutput.append('需要选取%d张牌' % int(text))
-                self.manualCardNumber = int(text)
+                self.sg_cardnumber = int(text)
                 pass
             else:
                 return

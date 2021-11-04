@@ -193,7 +193,7 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
                 if cards[i] == 1: 
                     a = card(0, i)
                     mcards.append(a)
-            if len(mcards) >= 20 and self.warned == 0:
+            if len(mcards) > 20 and self.warned == 0:
                 self.textBrowser.setText("##--!--!--Warning--!--!--## You choose too many cards")
                 self.textBrowser.append("If you still want to use these cards, click one more time to search")
                 self.warned = 1
@@ -242,12 +242,16 @@ class MyUi(QtWidgets.QMainWindow, Ui_MainWindow):
         self.warned = 0
         type = self.comboBox.currentIndex()
         if type == 0:
+            self.card_hide()
             self.textBrowser.setText("You changed the function to [set numbers, no scores]")
         elif type == 1:
+            self.card_hide()
             self.textBrowser.setText("You changed the function to [set cards, no scores]")
         elif type == 2:
+            self.card_hide()
             self.textBrowser.setText("You changed the function to [set numbers, with scores]")
         elif type == 3:
+            self.card_hide()
             self.textBrowser.setText("You changed the function to [set cards, with scores]")
 
 

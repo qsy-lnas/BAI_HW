@@ -10,13 +10,28 @@ def transparence2white(img):
         for xw in range(width):
             dot=(xw,yh)
             color_d=img.getpixel(dot)  # 与cv2不同的是，这里需要用getpixel方法来获取维度数据
-            if(color_d[3]==0):
+            
+            if(color_d==0):
                 color_d=(255,255,255,255)
                 img.putpixel(dot,color_d)  # 赋值的方法是通过putpixel
     return img
- 
-for i in range(13, 29), range(30, 43), range(45, 58), range(60, 73):
 
+for i in range(15, 28):
+    img=Image.open(str(i) + '.png')
+    img=transparence2white(img)
+    # img.show()  # 显示图片
+    img.save(str(i) + '.png')  # 保存图片
+for i in range(30, 43):
+    img=Image.open(str(i) + '.png')
+    img=transparence2white(img)
+    # img.show()  # 显示图片
+    img.save(str(i) + '.png')  # 保存图片
+for i in range(45, 58):
+    img=Image.open(str(i) + '.png')
+    img=transparence2white(img)
+    # img.show()  # 显示图片
+    img.save(str(i) + '.png')  # 保存图片
+for i in range(60, 73):
     img=Image.open(str(i) + '.png')
     img=transparence2white(img)
     # img.show()  # 显示图片
