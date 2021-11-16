@@ -4,6 +4,7 @@ import numpy as np
 import os
 from tqdm import tqdm
 
+from scipy.linalg import expm
 
 
 def shuffle(X, Y, seed=2019011455):
@@ -49,20 +50,60 @@ def ext_feature(train_X, test_X, threshold = 200):
     test_feature = np.sum(test_X > threshold, axis=1)/784
     return train_feature, test_feature
 
-
 def train(w, b, X, Y, alpha=0.1, epochs=50, batchsize=32):
     """
     YOUR CODE HERE
     """
-    for i in range(epochs):
-
+    with tqdm(total = epochs) as t:
+        for i in range(epochs):
+            '''split the dataset'''
+            random.seed(i)
+            index = [i for i in range(X.shape[0])]
+            random.shuffle(index)
+            X = X[index]
+            Y = Y[index]
+            '''train'''
+            for k in range(X.shape[0] // batchsize):
+                X_ = X[k * batchsize : (k + 1) * batchsize]
+                Y_ = Y[k * batchsize : (k + 1) * batchsize]
+                Z = np.dot(w, X_) + b
+                H = np.power(np.e, Z) / (1 + np.power(np.e, Z))
+                Deltab  = np.mean(H - Y_)
+                Deltaw = np.mean(np.dot(H - Y_, X_))
+                if k == X.shape[0] // batchsize - 1:
+                    loss = np.mean(-Y_ * np.log(H) - (1 - Y_) * np.log(1 - H))
+                    t.set_postfix(loss = loss)
+                    t.update(1)
+                w = w - Deltaw * alpha
+                b = b - Deltab * alpha
+                
     return w, b
-
 
 def test(w, b, X, Y):
     """
     YOUR CODE HERE
     """
+    Z = np.dot(w, X) + b
+    index_z_1 = (Z == 1)
+    index_z_0 = (Z == 0)
+    index_y_1 = (Y == 1)
+    index_y_0 = (Y == 0)
+    TP = np.sum(index_z_1 * index_y_1)
+    FP = np.sum(index_z_1 * index_y_0)
+    FN = np.sum(index_z_0 * index_y_1)
+    TN = np.sum(index_z_0 * index_y_0)
+    # Accuracy
+    ACC = (TP + TN) / (TP + TN + FP + FN)
+    print("ACC = %.4f"%ACC)
+    # Balances error rate
+    BER = 0.5 * (FP / (FP + TN) + FN / (FN + TP))
+    print("BER = %.4f"%BER)
+    # Matthew's correlation coefficient
+    MCC = (TP * TN - FP * FN) / (\
+        (TP + FP) * (FP + TN) * (TN + FN) * (FN + TP)) ** 0.5
+    print("MCC = %.4f"%MCC)
+    # 
+
 
 
 if __name__ == "__main__":
@@ -74,11 +115,18 @@ if __name__ == "__main__":
     # 抽取特征
     train_feature, test_feature = ext_feature(train_X, test_X)
     
-    # 随机初始化参数
+    # 初始化参数
     w = np.random.randn()
     b = np.random.randn()
-    print(w, b)
+    #print(w, b)
+    alpha = 0.1
+    epochs = 50
+    batchsize = 32
     
-    # 训练及测试
-    w, b = train(w, b, train_X, train_Y)
+    # train
+    w, b = train(w, b, train_feature, train_Y, alpha, epochs, batchsize)
+
+    #test
+    test(w, b, test_feature, test_Y)
+
     
