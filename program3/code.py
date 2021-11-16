@@ -8,7 +8,7 @@ def shuffle(X, Y, seed=0):
     """
     随机打乱原始数据
     """
-    random.seed(0)
+    random.seed(seed)
     index = [i for i in range(X.shape[0])]
     random.shuffle(index)
     return X[index], Y[index]
