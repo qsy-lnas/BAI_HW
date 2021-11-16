@@ -2,9 +2,11 @@ import scipy.io as scio
 import random
 import numpy as np
 import os
+from tqdm import tqdm
 
 
-def shuffle(X, Y, seed=0):
+
+def shuffle(X, Y, seed=2019011455):
     """
     随机打乱原始数据
     """
@@ -12,7 +14,6 @@ def shuffle(X, Y, seed=0):
     index = [i for i in range(X.shape[0])]
     random.shuffle(index)
     return X[index], Y[index]
-
 
 def get_zero_and_one(X, Y):
     """
@@ -23,7 +24,6 @@ def get_zero_and_one(X, Y):
     index = index_1 + index_8
     return X[index], Y[index]
     
-
 def load_data(data_dir="./", data_file="mnist.mat"):
     # 加载数据，划分数据集
     data = scio.loadmat(os.path.join(data_dir, data_file))
@@ -40,14 +40,13 @@ def load_data(data_dir="./", data_file="mnist.mat"):
     test_Y = (test_Y==1).astype(np.float32)
     print("原始图片共有%d张，其中数字1的图片有%d张。" % (test_X.shape[0], sum(test_Y==1)))
     return train_X, train_Y, test_X, test_Y
-    
-    
-def ext_feature(train_X, test_X):
+        
+def ext_feature(train_X, test_X, threshold = 200):
     """
     抽取图像的白色像素点比例作为特征
     """
-    train_feature = np.sum(train_X>200, axis=1)/784
-    test_feature = np.sum(test_X>200, axis=1)/784
+    train_feature = np.sum(train_X > threshold, axis=1)/784
+    test_feature = np.sum(test_X > threshold, axis=1)/784
     return train_feature, test_feature
 
 
@@ -55,6 +54,8 @@ def train(w, b, X, Y, alpha=0.1, epochs=50, batchsize=32):
     """
     YOUR CODE HERE
     """
+    for i in range(epochs):
+
     return w, b
 
 
@@ -65,17 +66,19 @@ def test(w, b, X, Y):
 
 
 if __name__ == "__main__":
+    seed = 2019011455
+    #指定种子
+    np.random.seed(seed)
     # 加载数据
-    train_X, train_Y, test_X, test_Y = load_data(data_dir="../")
+    train_X, train_Y, test_X, test_Y = load_data(data_dir="program3/")
     # 抽取特征
     train_feature, test_feature = ext_feature(train_X, test_X)
     
     # 随机初始化参数
     w = np.random.randn()
     b = np.random.randn()
+    print(w, b)
     
     # 训练及测试
-    """
-    YOUR CODE HERE
-    """
+    w, b = train(w, b, train_X, train_Y)
     
