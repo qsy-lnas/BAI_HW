@@ -9,19 +9,19 @@ from sklearn.linear_model import LogisticRegression
 from scipy.linalg import expm
 from tqdm import tqdm
 
-def plot_acc_loss(loss):
+def plot_acc_loss(loss, acc):
     host = host_subplot(111)  # row=1 col=1 first pic
     plt.subplots_adjust(right=0.8)  # ajust the right boundary of the plot window
-    #par1 = host.twinx()   # 共享x轴
+    par1 = host.twinx()   # 共享x轴
  
     # set labels
     host.set_xlabel("steps")
-    host.set_ylabel("test-loss")
-    #par1.set_ylabel("test-accuracy")
+    host.set_ylabel("train-loss")
+    par1.set_ylabel("train-accuracy")
  
     # plot curves
     p1, = host.plot(range(len(loss)), loss, label="loss")
-    #p2, = par1.plot(range(len(acc)), acc, label="accuracy")
+    p2, = par1.plot(range(len(acc)), acc, label="accuracy")
  
     # set location of the legend,
     # 1->rightup corner, 2->leftup corner, 3->leftdown corner
@@ -30,7 +30,7 @@ def plot_acc_loss(loss):
  
     # set label color
     host.axis["left"].label.set_color(p1.get_color())
-    #par1.axis["right"].label.set_color(p2.get_color())
+    par1.axis["right"].label.set_color(p2.get_color())
  
     # set the range of x axis of host and y axis of par1
     # host.set_xlim([-200, 5200])
@@ -84,9 +84,13 @@ def ext_feature(train_X, test_X, threshold = 200):
 
 def train(w, b, X, Y, alpha=0.1, epochs=50, batchsize=32):
     """
-    YOUR CODE HERE
+    Input random parameters w, b and features:X labels:Y\\
+    Set the parameters alpha as learning rate, epochs and batchsize\\
+    return trained w, b and recording the train loss and accuracy
+
     """
     loss = np.zeros(epochs)
+    acc = np.zeros(epochs)
     with tqdm(total = epochs) as t:
         for i in range(epochs):
             '''split the dataset'''
@@ -96,28 +100,32 @@ def train(w, b, X, Y, alpha=0.1, epochs=50, batchsize=32):
             X = X[index]
             Y = Y[index]
             '''train'''
+            acc_sum = 0
             loss_sum = 0
             for k in range(X.shape[0] // batchsize):
                 X_ = X[k * batchsize : (k + 1) * batchsize]
                 Y_ = Y[k * batchsize : (k + 1) * batchsize]
                 Z = np.dot(w, X_) + b
+                Z_ = Z > 0.5
+                Y__ = Y_ == 1
+                acc_sum += (np.sum(Z_ * Y__) + np.sum(~Z_ * ~Y__)) / batchsize
                 H = np.power(np.e, Z) / (1 + np.power(np.e, Z))
                 Deltab  = np.mean(H - Y_)
                 Deltaw = np.mean(np.dot(H - Y_, X_))   
                 loss_sum += np.mean(-Y_ * np.log(H) - (1 - Y_) * np.log(1 - H))             
                 if k == X.shape[0] // batchsize - 1:
-                    
+                    acc[i] = acc_sum / (k + 1)
                     loss[i] = loss_sum / (k + 1)
                     t.set_postfix(loss = loss_sum / (k + 1))
                     t.update(1)
                 w = w - Deltaw * alpha
                 b = b - Deltab * alpha
                 
-    return w, b, loss
+    return w, b, loss, acc
 
 def test(w, b, X, Y, threshold):
     """
-    YOUR CODE HERE
+    Use trained parameters w, b with testfeature:X, test_labels:Y to evaluate the model
     """
     print("w = %.4f, b = %.4f" % (w, b))
     Z = np.dot(w, X) + b
@@ -228,8 +236,8 @@ if __name__ == "__main__":
     batchsize = 16
     test_threshold = 0.5
     # train
-    w, b, loss = train(w, b, train_feature, train_Y, alpha, epochs, batchsize)
-    plot_acc_loss(loss)
+    w, b, loss, acc = train(w, b, train_feature, train_Y, alpha, epochs, batchsize)
+    plot_acc_loss(loss, acc)
     Z = train_sklearn(train_feature, train_Y, test_feature, epochs)
     #print(Z.shape)
     #test

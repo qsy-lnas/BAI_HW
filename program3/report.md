@@ -4,53 +4,113 @@
 
 ### 1.作业要求
 
-我本次作业选择的是完成八皇后问题，本题我采用的是回溯搜索的算法，由于问题复杂度较低，可以不采用较为复杂的回溯算法，只采用最基础的类似于添加了约束条件的DFS算法即可实现目标。
+本次编程作业要求使用手写数字图片中的白色像素数量作为每个数据点的特征值，进行Logistic回归计算，并利用梯度下降算法得到较优的模型，并对模型进行评价。
+
+### 2.理论计算
+
+*推导使用随机梯度下降法求解**一元Logistic回归**的过程：*
+
+
 
 ### 2.算法实现
 
-```python
-def dfs(b, point):
-    valid_points = b.get_possible_moves()
-    if len(valid_points) == 0:
-        if len(b.queen) == 8:
-            return True
-        return False
-    else:
-        for point in valid_points:
-            b.make_move(point)
-            if dfs(b, point) == True:
-                return True
-            b.remove_move(point)
-```
-
-以上函数为我实现本题的主要算法，主要思路就是在递归到全部点时判断是否满足约束条件，如果不满足约束条件则返回继续搜索。
-
-在本题最开始的尝试中，我也试图使用最少剩余项和最多约束项的方式进行回溯搜索，不过进行了复杂度分析之后，我觉得对于本题来说，上述的方式的代价与收益差别不大，于是还是采用了最基础的DFS改进的方式完成，下附最少约束项的确定方式：
+**训练部分：**
 
 ```python
-def valuable_line(points, valid_lines):
-    #count the points in each line
-    lines = [0] * 8
-    #return line
-    ret = 0
-    #return points
-    valid_points = []
-    value = 8
-    value_lines = [0] * 8
-    for point in points:
-        value_lines[point // 8] = 1
-        lines[point // 8] += 1
-    i = -1
-    for line in lines:
-        i += 1
-        if valid_lines[i] * value_lines[i] == 0:
-            continue
-        if line < value:
-            value = line
-            ret = i + 1
-    for point in points:
-        if point // 8 == ret - 1:
-            valid_points.append(point)
-    return ret, valid_points
+def train(w, b, X, Y, alpha=0.1, epochs=50, batchsize=32):
+    """
+    Input random parameters w, b and features:X labels:Y\\
+    Set the parameters alpha as learning rate, epochs and batchsize\\
+    return trained w, b and recording the train loss and accuracy
+
+    """
+    loss = np.zeros(epochs)
+    acc = np.zeros(epochs)
+    with tqdm(total = epochs) as t:
+        for i in range(epochs):
+            '''split the dataset'''
+            random.seed(i)
+            index = [i for i in range(X.shape[0])]
+            random.shuffle(index)
+            X = X[index]
+            Y = Y[index]
+            '''train'''
+            acc_sum = 0
+            loss_sum = 0
+            for k in range(X.shape[0] // batchsize):
+                X_ = X[k * batchsize : (k + 1) * batchsize]
+                Y_ = Y[k * batchsize : (k + 1) * batchsize]
+                Z = np.dot(w, X_) + b
+                Z_ = Z > 0.5
+                Y__ = Y_ == 1
+                acc_sum += (np.sum(Z_ * Y__) + np.sum(~Z_ * ~Y__)) / batchsize
+                H = np.power(np.e, Z) / (1 + np.power(np.e, Z))
+                Deltab  = np.mean(H - Y_)
+                Deltaw = np.mean(np.dot(H - Y_, X_))   
+                loss_sum += np.mean(-Y_ * np.log(H) - (1 - Y_) * np.log(1 - H))             
+                if k == X.shape[0] // batchsize - 1:
+                    acc[i] = acc_sum / (k + 1)
+                    loss[i] = loss_sum / (k + 1)
+                    t.set_postfix(loss = loss_sum / (k + 1))
+                    t.update(1)
+                w = w - Deltaw * alpha
+                b = b - Deltab * alpha
+                
+    return w, b, loss, acc
 ```
+
+以上函数为训练函数，主要就是在batch内使用上一部分推导得到的梯度对参数$w, b$进行梯度下降运算，同时记录训练过程中的loss与accuracy。
+
+```python
+def test(w, b, X, Y, threshold):
+    """
+    Use trained parameters w, b with testfeature:X, test_labels:Y to evaluate the model
+    """
+    print("w = %.4f, b = %.4f" % (w, b))
+    Z = np.dot(w, X) + b
+    index_z_1 = (Z > threshold)
+    index_z_0 = (Z < threshold)
+    index_y_1 = (Y == 1)
+    index_y_0 = (Y == 0)
+    TP = np.sum(index_z_1 * index_y_1) / Z.shape[0]
+    FP = np.sum(index_z_1 * index_y_0) / Z.shape[0]
+    FN = np.sum(index_z_0 * index_y_1) / Z.shape[0]
+    TN = np.sum(index_z_0 * index_y_0) / Z.shape[0]
+    print(TP, FP, FN, TN)
+    # Accuracy
+    ACC = (TP + TN) / (TP + TN + FP + FN)
+    # Balances error rate
+    BER = 0.5 * (FP / (FP + TN) + FN / (FN + TP))
+    # Matthew's correlation coefficient
+    MCC = (TP * TN - FP * FN) / np.power((TP + FP) * (FP + TN) * (TN + FN) * (FN + TP), 0.5)
+    # Sensitivity
+    Sensitivity = TP / (TP + FN)
+    # Specificity
+    Specificity = TN / (TN + FP)
+    # Recall
+    Recall = TP / (TP + FN)
+    # Precision
+    Precision = TP / (TP + FP)
+    # F1-measure
+    F1 = 2 * Precision * Recall / (Precision + Recall)
+    # auROC
+    auROC = metrics.roc_auc_score(Y, Z)
+    # auPRC
+    auPRC = metrics.average_precision_score(Y, Z)
+```
+
+以上代码为我的评价函数，主要是针对模型给出的预测结果与真实标签做对比并依据诸多参数给出评价。在$epochs = 100, alpha = 0.05, bathcsize = 16$时，同时与sklearn的效果进行对比如下：
+
+| 评价指标 | My Model | sk-learn |
+| :------: | :------: | :------: |
+| Accuracy |          |          |
+|          |          |          |
+|          |          |          |
+|          |          |          |
+|          |          |          |
+|          |          |          |
+|          |          |          |
+|          |          |          |
+|          |          |          |
+|          |          |          |
 
