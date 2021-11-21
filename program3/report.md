@@ -58,10 +58,10 @@ def train(w, b, X, Y, alpha=0.1, epochs=50, batchsize=32):
                 X_ = X[k * batchsize : (k + 1) * batchsize]
                 Y_ = Y[k * batchsize : (k + 1) * batchsize]
                 Z = np.dot(w, X_) + b
-                Z_ = Z > 0.5
+                H = np.power(np.e, Z) / (1 + np.power(np.e, Z))
+                Z_ = H > 0.5
                 Y__ = Y_ == 1
                 acc_sum += (np.sum(Z_ * Y__) + np.sum(~Z_ * ~Y__)) / batchsize
-                H = np.power(np.e, Z) / (1 + np.power(np.e, Z))
                 Deltab  = np.mean(H - Y_)
                 Deltaw = np.mean(np.dot(H - Y_, X_))   
                 loss_sum += np.mean(-Y_ * np.log(H) - (1 - Y_) * np.log(1 - H))             
@@ -80,7 +80,7 @@ def train(w, b, X, Y, alpha=0.1, epochs=50, batchsize=32):
 
 训练过程中的loss曲线与accuracy曲线如下图所示：
 
-<img src="report.assets/b41399846ecc996b8fc158aab44201b.png" alt="b41399846ecc996b8fc158aab44201b" style="zoom:35%;" />
+<img src="report.assets/image-20211121102428389.png" alt="image-20211121102428389" style="zoom:33%;" />
 
 **测试部分：**
 
@@ -91,14 +91,15 @@ def test(w, b, X, Y, threshold):
     """
     print("w = %.4f, b = %.4f" % (w, b))
     Z = np.dot(w, X) + b
-    index_z_1 = (Z > threshold)
-    index_z_0 = (Z < threshold)
+    H = np.power(np.e, Z) / (1 + np.power(np.e, Z))
+    index_z_1 = (H > threshold)
+    index_z_0 = (H < threshold)
     index_y_1 = (Y == 1)
     index_y_0 = (Y == 0)
-    TP = np.sum(index_z_1 * index_y_1) / Z.shape[0]
-    FP = np.sum(index_z_1 * index_y_0) / Z.shape[0]
-    FN = np.sum(index_z_0 * index_y_1) / Z.shape[0]
-    TN = np.sum(index_z_0 * index_y_0) / Z.shape[0]
+    TP = np.sum(index_z_1 * index_y_1) / H.shape[0]
+    FP = np.sum(index_z_1 * index_y_0) / H.shape[0]
+    FN = np.sum(index_z_0 * index_y_1) / H.shape[0]
+    TN = np.sum(index_z_0 * index_y_0) / H.shape[0]
     print(TP, FP, FN, TN)
     # Accuracy
     ACC = (TP + TN) / (TP + TN + FP + FN)
@@ -126,18 +127,18 @@ def test(w, b, X, Y, threshold):
 
 |              评价指标               | My Model | sk-learn |
 | :---------------------------------: | :------: | :------: |
-|              Accuracy               |  0.8917  |  0.8983  |
-|         Balance error rate          |  0.1072  |  0.1029  |
-| Matthew's correlation ccoeffiecient |  0.7839  |  0.7955  |
-|             Sensitivity             |  0.8775  |  0.9145  |
-|             Specificity             |  0.9082  |  0.8796  |
-|               Recall                |  0.8775  |  0.9145  |
-|              Precision              |  0.9171  |  0.8979  |
-|             F1-measure              |  0.8969  |  0.9062  |
+|              Accuracy               |  0.8983  |  0.8983  |
+|         Balance error rate          |  0.1029  |  0.1029  |
+| Matthew's correlation ccoeffiecient |  0.7955  |  0.7955  |
+|             Sensitivity             |  0.9145  |  0.9145  |
+|             Specificity             |  0.8796  |  0.8796  |
+|               Recall                |  0.9145  |  0.9145  |
+|              Precision              |  0.8979  |  0.8979  |
+|             F1-measure              |  0.9062  |  0.9062  |
 |                auROC                |  0.9538  |  0.8971  |
 |                auPRC                |  0.9566  |  0.8670  |
 
-<img src="report.assets/image-20211117105040362.png" alt="image-20211117105040362" style="zoom:67%;" />
+<img src="report.assets/image-20211121102748633.png" alt="image-20211121102748633" style="zoom:67%;" />
 
 下面代码为我使用sklearn部分的代码：
 

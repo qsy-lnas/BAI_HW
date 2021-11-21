@@ -106,10 +106,10 @@ def train(w, b, X, Y, alpha=0.1, epochs=50, batchsize=32):
                 X_ = X[k * batchsize : (k + 1) * batchsize]
                 Y_ = Y[k * batchsize : (k + 1) * batchsize]
                 Z = np.dot(w, X_) + b
-                Z_ = Z > 0.5
+                H = np.power(np.e, Z) / (1 + np.power(np.e, Z))
+                Z_ = H > 0.5
                 Y__ = Y_ == 1
                 acc_sum += (np.sum(Z_ * Y__) + np.sum(~Z_ * ~Y__)) / batchsize
-                H = np.power(np.e, Z) / (1 + np.power(np.e, Z))
                 Deltab  = np.mean(H - Y_)
                 Deltaw = np.mean(np.dot(H - Y_, X_))   
                 loss_sum += np.mean(-Y_ * np.log(H) - (1 - Y_) * np.log(1 - H))             
@@ -123,20 +123,21 @@ def train(w, b, X, Y, alpha=0.1, epochs=50, batchsize=32):
                 
     return w, b, loss, acc
 
-def test(w, b, X, Y, threshold):
+def test(w, b, X, Y, threshold = 0.5):
     """
     Use trained parameters w, b with testfeature:X, test_labels:Y to evaluate the model
     """
     print("w = %.4f, b = %.4f" % (w, b))
     Z = np.dot(w, X) + b
-    index_z_1 = (Z > threshold)
-    index_z_0 = (Z < threshold)
+    H = np.power(np.e, Z) / (1 + np.power(np.e, Z))
+    index_z_1 = (H > threshold)
+    index_z_0 = (H < threshold)
     index_y_1 = (Y == 1)
     index_y_0 = (Y == 0)
-    TP = np.sum(index_z_1 * index_y_1) / Z.shape[0]
-    FP = np.sum(index_z_1 * index_y_0) / Z.shape[0]
-    FN = np.sum(index_z_0 * index_y_1) / Z.shape[0]
-    TN = np.sum(index_z_0 * index_y_0) / Z.shape[0]
+    TP = np.sum(index_z_1 * index_y_1) / H.shape[0]
+    FP = np.sum(index_z_1 * index_y_0) / H.shape[0]
+    FN = np.sum(index_z_0 * index_y_1) / H.shape[0]
+    TN = np.sum(index_z_0 * index_y_0) / H.shape[0]
     print(TP, FP, FN, TN)
     # Accuracy
     ACC = (TP + TN) / (TP + TN + FP + FN)
@@ -219,7 +220,7 @@ def test_sklearn(Z, Y, threshold):
     print("auPRC = %.4f" % auPRC)
 
 if __name__ == "__main__":
-    seed = 2019011455
+    seed = 96
     #指定种子
     np.random.seed(seed)
     # 加载数据
