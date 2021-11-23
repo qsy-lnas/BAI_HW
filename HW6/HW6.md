@@ -1,6 +1,6 @@
 ### T1
-$$
 
+$$
 \therefore \log P(y^{(i)} = k) = \beta_k x_i - \log Z\\
 \therefore P(y^{(i)} = k) = \frac{e^{\beta_k x_i}}{Z}\\
 设进行n分类，则有\sum^n_{k = 1} P(y^{(i)} = k) = 1\\
@@ -54,7 +54,7 @@ $$
    \frac{d o_1'}{d z_1} &= o_1'(1 - o_1'), \frac{d  o_1'}{d z_2} = o_2'(1 - o_2')\\
    \frac{d z_1}{d w_5} &= h_1, \frac{d z_2}{d w_6} = h_1\\
    \frac{de}{dw_5} &= \frac{de}{do_1'}\frac{d o_1'}{d z_1}\frac{d z_1}{d w_5} = h_1o_1'(o_1' - o_1)(1 - o_1') = 0.0708\\
-   \frac{de}{dw_6} &= \frac{de}{do_2'}\frac{d o_2'}{d z_2}\frac{d z_2}{d w_6} = h_2o_2'(o_2' - o_2)(1 - o_2') = -0.0186\\
+   \frac{de}{dw_6} &= \frac{de}{do_2'}\frac{d o_2'}{d z_2}\frac{d z_2}{d w_6} = h_1o_2'(o_2' - o_2)(1 - o_2') = -0.0185\\
    \end{align}
    $$
 
