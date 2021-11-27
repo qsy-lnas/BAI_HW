@@ -10,6 +10,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data as data
 from torch.autograd import Variable
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.metrics import confusion_matrix
 
 
 '''Model of three questions'''
@@ -135,7 +137,7 @@ def plot_acc_loss(train_acc, test_acc, args):
     # par1.set_ylim([-0.1, 1.1])
  
     plt.draw()
-    plt.show("%s.png"%args.name)
+    plt.savefig("%s.png"%args.name)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--name', type=str, default='',  help='model name')
@@ -183,7 +185,7 @@ for epoch in range(args.nepoch):
     num_batch = len(trainloader)
     net.train()
 
-"""     print('Training Epoch [%d/%d]' % (epoch, args.nepoch)) """
+    """ print('Training Epoch [%d/%d]' % (epoch, args.nepoch)) """  
 
     for idx, (image, label) in enumerate(trainloader, 0):
         steps += 1
@@ -213,7 +215,8 @@ for epoch in range(args.nepoch):
     total_test_loss = 0
     net.eval()
 
-"""     print('Evaluating Epoch [%d/%d]' % (epoch, args.nepoch)) """
+    
+    """     print('Evaluating Epoch [%d/%d]' % (epoch, args.nepoch)) """
 
     for idx, (image, label) in enumerate(testloader, 0):
         with torch.no_grad():
@@ -231,4 +234,52 @@ for epoch in range(args.nepoch):
     print('test accuracy: %.6f, best accuracy: %.6f' % (test_acc, best_acc))
     test_acc_for_plt[epoch] = test_acc
 
+'''save acc plot'''
 plot_acc_loss(train_acc_for_plt, test_acc_for_plt, args)
+
+'''Evaluate the model'''
+class_correct = list(0. for i in range(10))
+class_total = list(0. for i in range(10))
+net.eval()
+preds = []
+trues = []
+with torch.no_grad(): # 测试集不更新梯度
+    for i, data in enumerate(testloader, 0):
+        images, labels = data[0].to(device), data[1].to(device)
+        outputs = net(images)
+        _, predicted = torch.max(outputs.data, 1)
+        c = (predicted == labels)
+        for i in range(10):
+            label = labels[i]
+            class_correct[label] += c[i].item()
+            class_total[label] += 1
+        preds.extend(outputs.argmax(dim=1).detach().cpu().numpy())
+        trues.extend(labels.detach().cpu().numpy())
+
+# Accuracy
+for i in range(10):
+    print('Accuracy of %d: %6f%%' %(i, 100 * class_correct[i] / class_total[i]))
+# Precision
+print('precision_micro: %.6f' %precision_score(trues, preds, average = 'micro'))
+print('precision_macro: %.6f' %precision_score(trues, preds, average = 'macro'))
+# Recall
+print('recall_micro: %.6f' %recall_score(trues, preds, average='micro'))
+print('recall_macro: %.6f' %recall_score(trues, preds, average='macro'))
+# F1-measure
+print('F1_micro: %.6f' %f1_score(trues, preds, average='micro'))
+print('F1_macro: %.6f' %f1_score(trues, preds, average='macro'))
+
+print(classification_report(trues, preds))
+
+
+# Balances error rate
+
+# Matthew's correlation coefficient
+
+# Sensitivity
+
+# Specificity
+
+# auROC
+
+# auPRC
