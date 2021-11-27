@@ -1,0 +1,1 @@
+u python -u train.py --name $1 --log_name $log_name $other_options 2>&1|tee log/$log_name.log
