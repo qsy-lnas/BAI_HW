@@ -1,6 +1,7 @@
 import argparse
 import os
-
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import host_subplot
 import numpy as np
 import scipy.io as scio
 import torch
@@ -8,7 +9,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data as data
-from torch.utils.tensorboard import SummaryWriter
 from torch.autograd import Variable
 
 
@@ -107,6 +107,36 @@ class MNISTDataset(data.Dataset):
     def __len__(self):
         return self.data.shape[0]
 
+def plot_acc_loss(train_acc, test_acc, args):
+    host = host_subplot(111)  # row=1 col=1 first pic
+    plt.subplots_adjust(right=0.8)  # ajust the right boundary of the plot window
+    par1 = host.twinx()   # 共享x轴
+ 
+    # set labels
+    host.set_xlabel("steps")
+    host.set_ylabel("train-acc")
+    par1.set_ylabel("test-acc")
+ 
+    # plot curves
+    p1, = host.plot(range(len(train_acc)), train_acc, label="train_acc")
+    p2, = par1.plot(range(len(test_acc)), test_acc, label="test_acc")
+ 
+    # set location of the legend,
+    # 1->rightup corner, 2->leftup corner, 3->leftdown corner
+    # 4->rightdown corner, 5->rightmid ...
+    host.legend(loc=5)
+ 
+    # set label color
+    host.axis["left"].label.set_color(p1.get_color())
+    par1.axis["right"].label.set_color(p2.get_color())
+ 
+    # set the range of x axis of host and y axis of par1
+    # host.set_xlim([-200, 5200])
+    # par1.set_ylim([-0.1, 1.1])
+ 
+    plt.draw()
+    plt.show("%s.png"%args.name)
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--name', type=str, default='',  help='model name')
 parser.add_argument('--method', type=str, default='conv', choices=['softmax', 'linear', 'conv'])
@@ -114,9 +144,9 @@ parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--nepoch', type=int, default=100)
 parser.add_argument('--lr', type=float, default=0.01)
 args = parser.parse_args()
-#print(args)
+#print("%s.png"%args.name)
 
-writer = SummaryWriter(log_dir=f'./events/{args.name}', comment=args.name)
+#writer = SummaryWriter(log_dir=f'./events/{args.name}', comment=args.name)
 
 train_dataset = MNISTDataset(train=True)
 trainloader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size,
@@ -139,6 +169,8 @@ criterion = nn.CrossEntropyLoss().to(device)
 net = net.to(device)
 steps = 0
 best_acc = 0
+train_acc_for_plt = np.zeros(args.nepoch)
+test_acc_for_plt = np.zeros(args.nepoch)
 
 print("Training", args.name, "on", device)
 
@@ -151,7 +183,7 @@ for epoch in range(args.nepoch):
     num_batch = len(trainloader)
     net.train()
 
-    print('Training Epoch [%d/%d]' % (epoch, args.nepoch))
+"""     print('Training Epoch [%d/%d]' % (epoch, args.nepoch)) """
 
     for idx, (image, label) in enumerate(trainloader, 0):
         steps += 1
@@ -173,9 +205,7 @@ for epoch in range(args.nepoch):
         if idx % 100 == 0:
             accuracy = 100. * total_correct / total_num
             print('Train[%d: %d/%d] loss: %.6f accuracy: %.6f' % (epoch, idx, num_batch, total_train_loss / (idx + 1), accuracy))
-            writer.add_scalar('train/acc', accuracy, steps)
-            writer.add_scalar('train/loss', loss.item(), steps)
-            writer.flush()
+            train_acc_for_plt[epoch] = accuracy
 
     '''begin evaluating'''
     total_num = 0
@@ -183,7 +213,7 @@ for epoch in range(args.nepoch):
     total_test_loss = 0
     net.eval()
 
-    print('Evaluating Epoch [%d/%d]' % (epoch, args.nepoch))
+"""     print('Evaluating Epoch [%d/%d]' % (epoch, args.nepoch)) """
 
     for idx, (image, label) in enumerate(testloader, 0):
         with torch.no_grad():
@@ -199,6 +229,6 @@ for epoch in range(args.nepoch):
         best_acc = test_acc
 
     print('test accuracy: %.6f, best accuracy: %.6f' % (test_acc, best_acc))
-    writer.add_scalar('test/acc', test_acc, epoch)
-    writer.add_scalar('test/best_acc', best_acc, epoch)
-    writer.flush()
+    test_acc_for_plt[epoch] = test_acc
+
+plot_acc_loss(train_acc_for_plt, test_acc_for_plt, args)
