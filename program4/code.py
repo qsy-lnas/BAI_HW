@@ -10,8 +10,9 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data as data
 from torch.autograd import Variable
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import precision_score, recall_score, f1_score, matthews_corrcoef, classification_report
+from utils import plot_prc_figure , plot_roc_figure
+import copy
 
 
 '''Model of three questions'''
@@ -185,7 +186,7 @@ for epoch in range(args.nepoch):
     num_batch = len(trainloader)
     net.train()
 
-    """ print('Training Epoch [%d/%d]' % (epoch, args.nepoch)) """  
+    print('Training Epoch [%d/%d]' % (epoch, args.nepoch))
 
     for idx, (image, label) in enumerate(trainloader, 0):
         steps += 1
@@ -206,7 +207,7 @@ for epoch in range(args.nepoch):
 
         if idx % 100 == 0:
             accuracy = 100. * total_correct / total_num
-            print('Train[%d: %d/%d] loss: %.6f accuracy: %.6f' % (epoch, idx, num_batch, total_train_loss / (idx + 1), accuracy))
+            """ print('Train[%d: %d/%d] loss: %.6f accuracy: %.6f' % (epoch, idx, num_batch, total_train_loss / (idx + 1), accuracy)) """
             train_acc_for_plt[epoch] = accuracy
 
     '''begin evaluating'''
@@ -231,7 +232,7 @@ for epoch in range(args.nepoch):
     if test_acc > best_acc:
         best_acc = test_acc
 
-    print('test accuracy: %.6f, best accuracy: %.6f' % (test_acc, best_acc))
+    """ print('test accuracy: %.6f, best accuracy: %.6f' % (test_acc, best_acc)) """
     test_acc_for_plt[epoch] = test_acc
 
 '''save acc plot'''
@@ -243,10 +244,13 @@ class_total = list(0. for i in range(10))
 net.eval()
 preds = []
 trues = []
+outs = []
 with torch.no_grad(): # 测试集不更新梯度
     for i, data in enumerate(testloader, 0):
         images, labels = data[0].to(device), data[1].to(device)
         outputs = net(images)
+        origin_outputs = copy.deepcopy(outputs)
+        #print(origin_outputs)
         _, predicted = torch.max(outputs.data, 1)
         c = (predicted == labels)
         for i in range(10):
@@ -255,7 +259,8 @@ with torch.no_grad(): # 测试集不更新梯度
             class_total[label] += 1
         preds.extend(outputs.argmax(dim=1).detach().cpu().numpy())
         trues.extend(labels.detach().cpu().numpy())
-
+        outs.extend(origin_outputs.detach().cpu().numpy())
+#print(outs[0].shape, len(outs))
 # Accuracy
 for i in range(10):
     print('Accuracy of %d: %6f%%' %(i, 100 * class_correct[i] / class_total[i]))
@@ -268,18 +273,13 @@ print('recall_macro: %.6f' %recall_score(trues, preds, average='macro'))
 # F1-measure
 print('F1_micro: %.6f' %f1_score(trues, preds, average='micro'))
 print('F1_macro: %.6f' %f1_score(trues, preds, average='macro'))
+# Matthew's correlation coefficient
+print('MCC:%.6f' % matthews_corrcoef(trues, preds))
 
 print(classification_report(trues, preds))
 
 
-# Balances error rate
-
-# Matthew's correlation coefficient
-
-# Sensitivity
-
-# Specificity
-
 # auROC
-
+plot_roc_figure(trues, outs, args.name)
 # auPRC
+plot_prc_figure(trues, outs, args.name)
